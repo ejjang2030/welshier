@@ -1,5 +1,20 @@
+import {getAuth, signOut} from "firebase/auth";
+import {app} from "firebaseApp";
+
 const ProfilePage = () => {
-  return <h1>Profile Page</h1>;
+  const handleLogout = async () => {
+    await signOut(getAuth(app));
+  };
+
+  return (
+    <div>
+      <button
+        type='button'
+        onClick={handleLogout}>
+        로그아웃
+      </button>
+    </div>
+  );
 };
 
 export default ProfilePage;

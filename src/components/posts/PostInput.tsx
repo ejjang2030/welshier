@@ -5,8 +5,12 @@ import {MdOutlineGifBox} from "react-icons/md";
 import {CgMenuLeft} from "react-icons/cg";
 import {LuImage} from "react-icons/lu";
 import {MdOutlinePhotoCamera} from "react-icons/md";
+import {useContext} from "react";
+import AuthContext from "context/AuthContext";
 
 const PostInput = () => {
+  const {user} = useContext(AuthContext);
+
   return (
     <div className='post-input'>
       <Link to={`/posts/new`}>
@@ -15,7 +19,7 @@ const PostInput = () => {
             <div className='post-input__box-profile-image'></div>
           </div>
           <div className='post-input__box-body'>
-            <div className='post-input__box-body-username'>ejjang2030</div>
+            <div className='post-input__box-body-username'>{user?.email}</div>
             <div className='post-input__box-body-content'>
               새로운 소식이 있나요?
             </div>

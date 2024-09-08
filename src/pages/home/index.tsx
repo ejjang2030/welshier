@@ -54,35 +54,35 @@ const posts: PostProps[] = [
     uid: "awerwerwe121213",
   },
   {
-    id: "4",
+    id: "5",
     email: "ejjang2030@gmail.com",
     content: "한번 만들어보겠습니다!4",
     createdAt: "2024-09-07",
     uid: "awerwerwe121213",
   },
   {
-    id: "4",
+    id: "6",
     email: "ejjang2030@gmail.com",
     content: "한번 만들어보겠습니다!4",
     createdAt: "2024-09-07",
     uid: "awerwerwe121213",
   },
   {
-    id: "4",
+    id: "7",
     email: "ejjang2030@gmail.com",
     content: "한번 만들어보겠습니다!4",
     createdAt: "2024-09-07",
     uid: "awerwerwe121213",
   },
   {
-    id: "4",
+    id: "8",
     email: "ejjang2030@gmail.com",
     content: "한번 만들어보겠습니다!4",
     createdAt: "2024-09-07",
     uid: "awerwerwe121213",
   },
   {
-    id: "4",
+    id: "9",
     email: "ejjang2030@gmail.com",
     content: "한번 만들어보겠습니다!4",
     createdAt: "2024-09-07",
@@ -90,7 +90,7 @@ const posts: PostProps[] = [
   },
 ];
 
-const HomePage = ({user}: HomeProps) => {
+const HomePage = () => {
   const handleFileUpload = () => {};
   const handleDelete = () => {};
   const handleEdit = () => {};

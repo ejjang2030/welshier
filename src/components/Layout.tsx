@@ -3,13 +3,14 @@ import MenuList from "./Menu";
 
 interface LayoutProps {
   children: ReactNode;
+  isAuthenticated: boolean;
 }
 
-const Layout = ({children}: LayoutProps) => {
+const Layout = ({children, isAuthenticated}: LayoutProps) => {
   return (
     <div className='layout'>
       {children}
-      <MenuList />
+      {isAuthenticated && <MenuList />}
     </div>
   );
 };

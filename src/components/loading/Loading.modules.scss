@@ -1,0 +1,18 @@
+.loading {
+  background-color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  z-index: 9999;
+  position: absolute;
+  bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  div {
+    width: 100px;
+    height: 100px;
+    background-color: transparent;
+  }
+}
