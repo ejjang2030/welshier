@@ -11,6 +11,7 @@ import SearchPage from "pages/search";
 import LoginPage from "pages/users/login";
 import SignupPage from "pages/users/signup";
 import ResetPasswordPage from "pages/users/resetpassword";
+import SettingsPage from "pages/settings";
 
 interface RouterProps {
   isAuthenticated: boolean;
@@ -57,10 +58,13 @@ const Router = ({isAuthenticated}: RouterProps) => {
             path='/search'
             element={<SearchPage />}
           />
-
           <Route
             path='/feeds/:uid'
             element={<h1>feeds</h1>}
+          />
+          <Route
+            path='/settings'
+            element={<SettingsPage />}
           />
           <Route
             path='*'

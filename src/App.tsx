@@ -3,7 +3,7 @@ import Router from "components/Router";
 import Layout from "components/Layout";
 import {getAuth, onAuthStateChanged} from "firebase/auth";
 import {app} from "firebaseApp";
-import {ToastContainer} from "react-toastify";
+import {ToastContainer, Bounce} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Loading from "components/loading/Loading";
 
@@ -28,10 +28,16 @@ const App = () => {
   return (
     <Layout isAuthenticated={isAuthenticated}>
       <ToastContainer
+        position='bottom-center'
         autoClose={1000}
-        theme='dark'
         hideProgressBar
         newestOnTop
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable={false}
+        pauseOnHover={false}
+        transition={Bounce}
       />
       {isInit ? <Router isAuthenticated={isAuthenticated} /> : <Loading />}
     </Layout>

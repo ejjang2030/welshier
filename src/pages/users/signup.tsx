@@ -37,6 +37,10 @@ const SignupPage = () => {
       case "email":
         setEmail(value);
         const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+        if (!value) {
+          setErrorMsg("");
+          return;
+        }
         if (!value?.match(emailRegex)) {
           setErrorMsg("이메일 형식이 올바르지 않습니다.");
         } else {
