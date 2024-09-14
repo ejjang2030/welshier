@@ -143,6 +143,20 @@ body {
         color: gray;
         font-weight: 500;
         font-size: 14px;
+        textarea {
+          border: none;
+          width: 100%;
+          box-sizing: border-box;
+          // resize: none;
+          &:focus,
+          &:hover {
+            border: none;
+          }
+          &::placeholder {
+            font-family: $font;
+            color: #9c9c9c;
+          }
+        }
       }
       &-buttons {
         display: flex;
@@ -206,7 +220,7 @@ body {
 
 .post {
   color: black;
-  background-color: black;
+  background-color: white;
   a {
     text-decoration: none;
     background-color: transparent;
@@ -513,6 +527,10 @@ body {
         font-size: 16px;
         font-weight: 600;
         background-color: white;
+        &.follow-btn {
+          background-color: black;
+          color: white;
+        }
       }
     }
   }
@@ -541,74 +559,6 @@ body {
   &__body {
     @extend .flex-column;
     min-height: calc(100vh - 316px);
-    &-box {
-      padding: 16px;
-      @extend .flex-row;
-      gap: 16px;
-      border-bottom: 0.5px solid #ddd;
-      .image {
-        .img {
-          width: 40px;
-          height: 40px;
-          background-color: black;
-          border-radius: 999px;
-        }
-      }
-      .content {
-        @extend .flex-column;
-        gap: 8px;
-        width: 100%;
-        .profile-and-menu {
-          @extend .flex-row;
-          justify-content: space-between;
-          align-items: center;
-          width: 100%;
-          .profile {
-            @extend .flex-row;
-            gap: 4px;
-            font-weight: 600;
-            color: black;
-            span {
-              display: inline-block;
-              color: #a6a6a6;
-              font-size: 14px;
-              font-weight: 400;
-            }
-          }
-          .menu {
-            .icon {
-              color: #5f5e5e;
-            }
-          }
-        }
-      }
-      .body {
-        font-family: $font;
-        font-size: 16px;
-        font-weight: 400;
-      }
-      .post-footer {
-        margin: 8px 0 0;
-        .icons {
-          @extend .flex-row;
-          width: 80%;
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          .likes-btn,
-          .comments-btn,
-          .reposts-btn,
-          .send-btn {
-            @extend .flex-row;
-            align-items: center;
-            gap: 6px;
-            .icon {
-              width: 18px;
-              height: 18px;
-            }
-          }
-        }
-      }
-    }
   }
 }
 
@@ -728,4 +678,100 @@ body {
 .error-msg {
   color: red;
   font-size: 12px;
+}
+
+.post-box {
+  padding: 16px;
+  @extend .flex-row;
+  gap: 16px;
+  border-bottom: 0.5px solid #ddd;
+  .image {
+    .img {
+      width: 40px;
+      height: 40px;
+      background-color: white;
+      border-radius: 999px;
+      border: 0.5px solid #ddd;
+    }
+  }
+  .content {
+    @extend .flex-column;
+    gap: 8px;
+    width: 100%;
+    .profile-and-menu {
+      @extend .flex-row;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      .profile {
+        @extend .flex-row;
+        gap: 4px;
+        font-weight: 600;
+        color: black;
+        span {
+          display: inline-block;
+          color: #a6a6a6;
+          font-size: 14px;
+          font-weight: 400;
+        }
+      }
+      .menu {
+        .icon {
+          color: #5f5e5e;
+        }
+      }
+    }
+  }
+  .body {
+    font-family: $font;
+    font-size: 16px;
+    font-weight: 400;
+  }
+  .post-footer {
+    margin: 8px 0 0;
+    .icons {
+      @extend .flex-row;
+      width: 80%;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      .likes-btn,
+      .comments-btn,
+      .reposts-btn,
+      .send-btn {
+        @extend .flex-row;
+        align-items: center;
+        gap: 6px;
+        .icon {
+          width: 18px;
+          height: 18px;
+        }
+      }
+    }
+  }
+}
+
+.post-new {
+  &__appbar {
+    @extend .appbar;
+    position: sticky;
+    background-color: white;
+    z-index: 20;
+    top: 0;
+    left: 0;
+    right: 0;
+    &-box-left {
+      @extend .flex-row;
+      gap: 12px;
+    }
+    &-left {
+      @extend .appbar-icon;
+    }
+    &-right {
+      border: none;
+      color: #9c9c9c;
+      background-color: transparent;
+      font-size: 20px;
+      font-weight: 600;
+    }
+  }
 }

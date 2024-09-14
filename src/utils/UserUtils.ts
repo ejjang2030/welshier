@@ -6,43 +6,53 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import {db} from "firebaseApp";
+import { db } from "firebaseApp";
 
-export const getUserByUid = async (uid: string) => {
+export const getUserByUid = async (
+  uid: string,
+  cb: (userData: UserData) => void
+) => {
   const userRef = doc(db, "users", uid);
-  const userSnapshot = await getDoc(userRef);
-  return userSnapshot.data();
+  getDoc(userRef).then((snapshot) => {
+    const uData = snapshot.data() as UserData;
+    cb(uData);
+  });
 };
 
 export const getUserByUserId = async (userId: string) => {
   let uData;
   const q = query(collection(db, "users"), where("userId", "==", userId));
   const querySnapshot = await getDocs(q);
-  querySnapshot.forEach(res => {
+  querySnapshot.forEach((res) => {
     uData = res.data();
-  })
+  });
   return uData;
 };
 
-export const getUidByUserId = async (userId: string) => {
-  const q = query(collection(db, 'users'), where('userId', "==", userId));
-  const querySnapshot = await getDocs(q);
-  console.log(querySnapshot.docs[0])
-  // return querySnapshot.docs[0]?.data().id;
-}
+export const getUidByUserId = (userId: string, cb: (uid: string) => void) => {
+  const q = query(collection(db, "users"), where("userId", "==", userId));
+  getDocs(q).then((querySnapshot) => {
+    const uid = querySnapshot.docs.map((doc) => doc.id)[0];
+    cb(uid);
+  });
+};
 
-export const getUserIdByUid = async (uid: string) => {
+export const getUserIdByUid = async (
+  uid: string,
+  cb: (userId: string) => void
+) => {
   const userRef = doc(db, "users", uid);
-  const userSnapshot = await getDoc(userRef);
-  console.log('userSnapshot :', userSnapshot);
-  return userSnapshot.data()?.userId;
-}
+  getDoc(userRef).then((querySnapshot) => {
+    const userId = querySnapshot.data()?.userId;
+    cb(userId);
+  });
+};
 
 export const checkDuplicatedUserId = async (userId: string) => {
-  const q = query(collection(db, 'users'), where('userId', '==', userId));
+  const q = query(collection(db, "users"), where("userId", "==", userId));
   const snapshot = await getDocs(q);
   return snapshot && snapshot.docs.length > 0;
-}
+};
 
 interface UserData {
   name: string;

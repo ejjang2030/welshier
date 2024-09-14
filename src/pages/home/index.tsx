@@ -1,7 +1,7 @@
 import PostInput from "components/posts/PostInput";
 import { GiSittingDog } from "react-icons/gi";
-import {HiMenuAlt4} from "react-icons/hi";
-import {Link} from "react-router-dom";
+import { HiMenuAlt4 } from "react-icons/hi";
+import { Link } from "react-router-dom";
 import PostList from "components/posts/PostList";
 
 export interface PostProps {
@@ -28,65 +28,74 @@ const posts: PostProps[] = [
   {
     id: "1",
     email: "ejjang2030@gmail.com",
-    content: "한번 만들어보겠습니다!",
+    content: "한번 만들어보겠습니다!\n만들기만들기",
     createdAt: "2024-09-07",
-    uid: "awerwerwe121213",
+    likeCount: 111,
+    uid: "bTmDAGxyzwWR1imWno9x2IJE5jn2",
   },
   {
     id: "2",
     email: "ejjang2030@gmail.com",
     content: "한번 만들어보겠습니다!2",
     createdAt: "2024-09-07",
-    uid: "awerwerwe121213",
+    likeCount: 111,
+    uid: "bTmDAGxyzwWR1imWno9x2IJE5jn2",
   },
   {
     id: "3",
     email: "ejjang2030@gmail.com",
     content: "한번 만들어보겠습니다!3",
     createdAt: "2024-09-07",
-    uid: "awerwerwe121213",
+    likeCount: 111,
+    uid: "SQShlShJLWZyyKVnJQQlsntTlW72",
   },
   {
     id: "4",
     email: "ejjang2030@gmail.com",
     content: "한번 만들어보겠습니다!4",
     createdAt: "2024-09-07",
-    uid: "awerwerwe121213",
+    likeCount: 111,
+    uid: "SQShlShJLWZyyKVnJQQlsntTlW72",
   },
   {
     id: "5",
     email: "ejjang2030@gmail.com",
     content: "한번 만들어보겠습니다!4",
     createdAt: "2024-09-07",
-    uid: "awerwerwe121213",
+    likeCount: 111,
+    uid: "SQShlShJLWZyyKVnJQQlsntTlW72",
   },
   {
     id: "6",
     email: "ejjang2030@gmail.com",
     content: "한번 만들어보겠습니다!4",
     createdAt: "2024-09-07",
-    uid: "awerwerwe121213",
+    likeCount: 111,
+    uid: "SQShlShJLWZyyKVnJQQlsntTlW72",
   },
   {
     id: "7",
     email: "ejjang2030@gmail.com",
     content: "한번 만들어보겠습니다!4",
     createdAt: "2024-09-07",
-    uid: "awerwerwe121213",
+    likeCount: 111,
+    uid: "SQShlShJLWZyyKVnJQQlsntTlW72",
   },
   {
     id: "8",
     email: "ejjang2030@gmail.com",
     content: "한번 만들어보겠습니다!4",
     createdAt: "2024-09-07",
-    uid: "awerwerwe121213",
+    likeCount: 111,
+    uid: "SQShlShJLWZyyKVnJQQlsntTlW72",
   },
   {
     id: "9",
     email: "ejjang2030@gmail.com",
     content: "한번 만들어보겠습니다!4",
     createdAt: "2024-09-07",
-    uid: "awerwerwe121213",
+    likeCount: 111,
+    uid: "SQShlShJLWZyyKVnJQQlsntTlW72",
   },
 ];
 
@@ -96,15 +105,15 @@ const HomePage = () => {
   const handleEdit = () => {};
 
   return (
-    <div className='home'>
-      <div className='home__title'>
-        <div className='home__title-left'></div>
-        <div className='home__title-logo'>
-          <GiSittingDog className='home__title-logo-icon' />
+    <div className="home">
+      <div className="home__title">
+        <div className="home__title-left"></div>
+        <div className="home__title-logo">
+          <GiSittingDog className="home__title-logo-icon" />
         </div>
-        <div className='home__title-right'>
+        <div className="home__title-right">
           <Link to={`/posts`}>
-            <HiMenuAlt4 className='home__title-right-icon' />
+            <HiMenuAlt4 className="home__title-right-icon" />
           </Link>
         </div>
       </div>

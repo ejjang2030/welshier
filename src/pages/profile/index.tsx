@@ -26,6 +26,7 @@ const ProfilePage = () => {
   const { user } = useContext(AuthContext);
   const location = useLocation();
   const [userData, setUserData] = useState<DocumentData | undefined>();
+  const [isItMe, setIsItMe] = useState<boolean>(false);
   const navigate = useNavigate();
   const [currTab, setCurrTab] = useState<"threads" | "comments" | "reposts">(
     "threads"
@@ -40,15 +41,16 @@ const ProfilePage = () => {
   );
 
   useEffect(() => {
-    getUserByUid(user!.uid).then((uData) => {
+    getUserByUid(user!.uid, (uData) => {
       setUserData(uData);
     });
   }, [user]);
 
   useEffect(() => {
     const currUserId = location.pathname.split("@")[1] as string;
-    const uid = getUidByUserId(currUserId);
-    console.log(uid);
+    getUidByUserId(currUserId, (uid) => {
+      setIsItMe(uid === user!.uid);
+    });
     getUserByUserId(currUserId).then((uData) => {
       setUserData(uData);
     });
@@ -84,7 +86,19 @@ const ProfilePage = () => {
           <div className="followers">팔로워 66명</div>
         </div>
         <div className="profile__my-profile-buttons">
-          <button onClick={() => navigate("/profile/edit")}>프로필 편집</button>
+          {isItMe ? (
+            <button onClick={() => navigate("/profile/edit")}>
+              프로필 편집
+            </button>
+          ) : (
+            <button
+              className="follow-btn"
+              onClick={() => console.log("follow")}
+            >
+              팔로우
+            </button>
+          )}
+
           <button>프로필 공유</button>
         </div>
       </div>
@@ -109,7 +123,20 @@ const ProfilePage = () => {
         </div>
       </div>
       <div className="profile__body">
-        <PostBox />
+        <PostBox
+          post={{
+            id: "sdfsdsdf",
+            email: "ejjang2030@gmail.com",
+            content: "내용입니다.",
+            createdAt: "2024-09-14",
+            uid: "bTmDAGxyzwWR1imWno9x2IJE5jn2",
+            profileUrl:
+              "https://firebasestorage.googleapis.com/v0/b/welshier.appspot.com/o/profiles%2FbTmDAGxyzwWR1imWno9x2IJE5jn2%2F58ae5356-f893-4bee-a01b-e3e016fc9904?alt=media&token=9768b439-c1f8-4d24-85d1-654408dcadde",
+            likes: [""],
+            likeCount: 31,
+            comments: null,
+          }}
+        />
       </div>
     </div>
   );

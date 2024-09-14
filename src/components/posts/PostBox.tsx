@@ -4,54 +4,48 @@ import { BsThreeDots as ThreeDotsIcon } from "react-icons/bs";
 import { MdOutlineInput as RepostIcon } from "react-icons/md";
 import { BsSend as SendIcon } from "react-icons/bs";
 import AuthContext from "context/AuthContext";
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
+import { PostProps } from "pages/home";
+import { getUserByUid, getUserIdByUid } from "utils/UserUtils";
+import "./Post.module.scss";
 
-const PostBox = () => {
-  const { user } = useContext(AuthContext);
+const PostBox = ({ post }: { post: PostProps }) => {
+  const [userId, setUserId] = useState<string>("");
+  const [userImageUrl, setUserImageUrl] = useState<string>("");
+  useEffect(() => {
+    getUserIdByUid(post.uid, (userId: string) => {
+      setUserId(userId);
+    });
+    getUserByUid(post.uid, (uData) => {
+      setUserImageUrl(uData.imageUrl);
+    });
+  }, []);
 
   return (
-    <div className="profile__body-box">
+    <div className="post-box">
       <div className="image">
-        <div className="img"></div>
+        <img className="img" src={userImageUrl} />
       </div>
       <div className="content">
         <div className="profile-and-menu">
           <div className="profile">
-            {user?.email}
+            {userId}
             <span>2주</span>
           </div>
           <div className="menu">
             <ThreeDotsIcon className="icon" />
           </div>
         </div>
-        <div className="body">
-          요즘 개발자들의 모습
-          <br />
-          <br />
-          1. 자기관리 및 자기계발하는데 끊임없이 투자한다.
-          <br />
-          <br />
-          2. 늘 항상 학습하는 습관이 갖춰져있다.
-          <br />
-          <br />
-          3. 다른 여러 개발자들과 소통하는 것에 관심이 많다.
-          <br />
-          <br />
-          4. 새로운 기술과 트렌드를 적용해보고 끊임 없이 탐구하려는 욕망이
-          강하다.
-          <br />
-          <br />- [요즘 개발자] 라는 책을 읽고 나서 책의 내용을 토대로 요즘
-          개발자의 모습이 어떤지 생각해 보았습니다.
-        </div>
+        <div className="body">{`${post.content}`}</div>
         <div className="post-footer">
           <div className="icons">
             <div className="likes-btn">
               <HeartIconOutline className="icon" />
-              <span>31</span>
+              <span>{post.likeCount}</span>
             </div>
             <div className="comments-btn">
               <ChatIcon className="icon" />
-              <span>2</span>
+              <span>{post.comments?.length || 0}</span>
             </div>
             <div className="reposts-btn">
               <RepostIcon className="icon" />
