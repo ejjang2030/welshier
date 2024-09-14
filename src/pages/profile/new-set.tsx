@@ -15,7 +15,7 @@ import {app, db, storage} from "firebaseApp";
 import {useContext} from "react";
 import AuthContext from "context/AuthContext";
 import {toast} from "react-toastify";
-import {getUserByUserId} from "utils/UserUtils";
+import {checkDuplicatedUserId, getUserByUserId} from "utils/UserUtils";
 import {v4 as uuidv4} from "uuid";
 import {getDownloadURL, ref, uploadString} from "firebase/storage";
 import {
@@ -48,7 +48,12 @@ const ProfileNewSetPage = ({isSignup = false}) => {
       return;
     }
     if (!userId) {
-      setErrorMsg("아이디를 입력해주세요");
+      setErrorMsg("아이디를 입력해주세요.");
+      return;
+    }
+    const isDuplicatedUserId = await checkDuplicatedUserId(userId);
+    if(isDuplicatedUserId) {
+      setErrorMsg('중복된 아이디가 존재합니다.');
       return;
     }
     if (!intro) {

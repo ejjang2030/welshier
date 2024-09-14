@@ -15,18 +15,34 @@ export const getUserByUid = async (uid: string) => {
 };
 
 export const getUserByUserId = async (userId: string) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const q = query(collection(db, "users"), where("userId", "==", userId));
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach(res => {
-        resolve(res.data());
-      });
-    } catch (error: any) {
-      reject(error);
-    }
-  });
+  let uData;
+  const q = query(collection(db, "users"), where("userId", "==", userId));
+  const querySnapshot = await getDocs(q);
+  querySnapshot.forEach(res => {
+    uData = res.data();
+  })
+  return uData;
 };
+
+export const getUidByUserId = async (userId: string) => {
+  const q = query(collection(db, 'users'), where('userId', "==", userId));
+  const querySnapshot = await getDocs(q);
+  console.log(querySnapshot.docs[0])
+  // return querySnapshot.docs[0]?.data().id;
+}
+
+export const getUserIdByUid = async (uid: string) => {
+  const userRef = doc(db, "users", uid);
+  const userSnapshot = await getDoc(userRef);
+  console.log('userSnapshot :', userSnapshot);
+  return userSnapshot.data()?.userId;
+}
+
+export const checkDuplicatedUserId = async (userId: string) => {
+  const q = query(collection(db, 'users'), where('userId', '==', userId));
+  const snapshot = await getDocs(q);
+  return snapshot && snapshot.docs.length > 0;
+}
 
 interface UserData {
   name: string;

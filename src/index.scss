@@ -253,8 +253,10 @@ body {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
     align-items: center;
+    justify-content: center;
     .button {
       width: 100%;
+      @extend .flex-row;
       background-color: transparent;
       box-shadow: none;
       justify-content: center;
@@ -265,15 +267,18 @@ body {
         color: black;
       }
       &__main-plus {
-        margin: 12px;
+        margin: 0 auto;
+        box-sizing: border-box;
         background-color: #dddddd50;
         border-radius: 15px;
         width: 60px;
         height: 40px;
+        @extend .flex-row;
+        justify-content: center;
         align-items: center;
         .icon {
-          width: 12px;
-          height: 12px;
+          width: 24px;
+          height: 24px;
           background-color: transparent;
         }
       }
@@ -410,6 +415,8 @@ body {
 }
 
 .profile {
+  @extend .flex-column;
+
   &__appbar {
     @extend .appbar;
     position: sticky;
@@ -533,6 +540,7 @@ body {
   }
   &__body {
     @extend .flex-column;
+    min-height: calc(100vh - 316px);
     &-box {
       padding: 16px;
       @extend .flex-row;
@@ -597,9 +605,6 @@ body {
               width: 18px;
               height: 18px;
             }
-          }
-          .reposts-btn > .icon {
-            stroke-width: 1.5px;
           }
         }
       }

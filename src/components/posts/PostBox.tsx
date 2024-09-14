@@ -1,30 +1,30 @@
-import {FaRegHeart} from "react-icons/fa";
-import {BiMessageRounded} from "react-icons/bi";
-import {BsThreeDots} from "react-icons/bs";
-import {CiRepeat} from "react-icons/ci";
-import {FiSend} from "react-icons/fi";
+import { BsHeart as HeartIconOutline } from "react-icons/bs";
+import { BsChat as ChatIcon } from "react-icons/bs";
+import { BsThreeDots as ThreeDotsIcon } from "react-icons/bs";
+import { MdOutlineInput as RepostIcon } from "react-icons/md";
+import { BsSend as SendIcon } from "react-icons/bs";
 import AuthContext from "context/AuthContext";
-import {useContext} from "react";
+import { useContext } from "react";
 
 const PostBox = () => {
-  const {user} = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
 
   return (
-    <div className='profile__body-box'>
-      <div className='image'>
-        <div className='img'></div>
+    <div className="profile__body-box">
+      <div className="image">
+        <div className="img"></div>
       </div>
-      <div className='content'>
-        <div className='profile-and-menu'>
-          <div className='profile'>
+      <div className="content">
+        <div className="profile-and-menu">
+          <div className="profile">
             {user?.email}
             <span>2주</span>
           </div>
-          <div className='menu'>
-            <BsThreeDots className='icon' />
+          <div className="menu">
+            <ThreeDotsIcon className="icon" />
           </div>
         </div>
-        <div className='body'>
+        <div className="body">
           요즘 개발자들의 모습
           <br />
           <br />
@@ -43,22 +43,22 @@ const PostBox = () => {
           <br />- [요즘 개발자] 라는 책을 읽고 나서 책의 내용을 토대로 요즘
           개발자의 모습이 어떤지 생각해 보았습니다.
         </div>
-        <div className='post-footer'>
-          <div className='icons'>
-            <div className='likes-btn'>
-              <FaRegHeart className='icon' />
+        <div className="post-footer">
+          <div className="icons">
+            <div className="likes-btn">
+              <HeartIconOutline className="icon" />
               <span>31</span>
             </div>
-            <div className='comments-btn'>
-              <BiMessageRounded className='icon' />
+            <div className="comments-btn">
+              <ChatIcon className="icon" />
               <span>2</span>
             </div>
-            <div className='reposts-btn'>
-              <CiRepeat className='icon' />
+            <div className="reposts-btn">
+              <RepostIcon className="icon" />
               <span>1</span>
             </div>
-            <div className='send-btn'>
-              <FiSend className='icon' />
+            <div className="send-btn">
+              <SendIcon className="icon" />
               <span>1</span>
             </div>
           </div>

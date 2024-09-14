@@ -1,6 +1,6 @@
 import React, {useState, useEffect, ChangeEvent} from "react";
 import {useNavigate} from "react-router-dom";
-import {RiThreadsLine} from "react-icons/ri";
+import { GiSittingDog } from "react-icons/gi";
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -98,7 +98,7 @@ const SignupPage = () => {
   return (
     <div className='signup'>
       <div className='signup__title'>
-        <RiThreadsLine className='signup__title-image' />
+        <GiSittingDog className='signup__title-image' />
         <span>회원가입</span>
       </div>
       <SignupForm

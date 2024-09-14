@@ -1,6 +1,6 @@
 import React, {useState, ChangeEvent} from "react";
 import LoginForm from "components/users/LoginForm";
-import {RiThreadsLine} from "react-icons/ri";
+import { GiSittingDog } from "react-icons/gi";
 import {RiKakaoTalkFill} from "react-icons/ri";
 import {SiNaver} from "react-icons/si";
 import {
@@ -64,7 +64,7 @@ const LoginPage = () => {
   return (
     <div className='login'>
       <div className='login__title'>
-        <RiThreadsLine className='login__title-image' />
+        <GiSittingDog className='login__title-image' />
         <span>로그인</span>
       </div>
       <LoginForm

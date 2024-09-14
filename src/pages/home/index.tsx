@@ -1,5 +1,5 @@
 import PostInput from "components/posts/PostInput";
-import {RiThreadsLine} from "react-icons/ri";
+import { GiSittingDog } from "react-icons/gi";
 import {HiMenuAlt4} from "react-icons/hi";
 import {Link} from "react-router-dom";
 import PostList from "components/posts/PostList";
@@ -100,7 +100,7 @@ const HomePage = () => {
       <div className='home__title'>
         <div className='home__title-left'></div>
         <div className='home__title-logo'>
-          <RiThreadsLine className='home__title-logo-icon' />
+          <GiSittingDog className='home__title-logo-icon' />
         </div>
         <div className='home__title-right'>
           <Link to={`/posts`}>

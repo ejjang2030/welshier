@@ -2,7 +2,7 @@ import {ChangeEvent, useState} from "react";
 import {getAuth, sendPasswordResetEmail} from "firebase/auth";
 import {app} from "firebaseApp";
 import {toast} from "react-toastify";
-import {RiThreadsLine} from "react-icons/ri";
+import { GiSittingDog } from "react-icons/gi";
 import {Link} from "react-router-dom";
 
 const ResetPasswordPage = () => {
@@ -33,7 +33,7 @@ const ResetPasswordPage = () => {
   return (
     <div className='reset-password'>
       <div className='reset-password__title'>
-        <RiThreadsLine className='reset-password__title-image' />
+        <GiSittingDog className='reset-password__title-image' />
         <span>비밀번호 재설정</span>
       </div>
       <div className='reset-password__form'>

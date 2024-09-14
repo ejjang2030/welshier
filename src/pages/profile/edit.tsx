@@ -15,7 +15,7 @@ import {app, db, storage} from "firebaseApp";
 import {useContext} from "react";
 import AuthContext from "context/AuthContext";
 import {toast} from "react-toastify";
-import {getUserByUserId} from "utils/UserUtils";
+import {checkDuplicatedUserId, getUserByUserId} from "utils/UserUtils";
 import {v4 as uuidv4} from "uuid";
 import {getDownloadURL, ref, uploadString} from "firebase/storage";
 import {
@@ -36,12 +36,30 @@ const ProfileEditPage = ({isSignup = false}) => {
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
   const [profileImage, setProfileImage] = useState<string | null>();
   const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string>('');
 
   const handleBack = async () => {
     navigate(-1);
   };
 
   const handleComplete = async (e: any) => {
+    if (!name) {
+      setErrorMsg("이름을 입력해주세요.");
+      return;
+    }
+    if (!userId) {
+      setErrorMsg("아이디를 입력해주세요.");
+      return;
+    }
+    const isDuplicatedUserId = await checkDuplicatedUserId(userId);
+    if(isDuplicatedUserId) {
+      setErrorMsg('중복된 아이디가 존재합니다.');
+      return;
+    }
+    if (!intro) {
+      setErrorMsg("소개를 입력해주세요");
+      return;
+    }
     const userRef = doc(db, "users", user!.uid);
     setIsUploading(true);
     const key = `profiles/${user?.uid}/${uuidv4()}`;
@@ -194,6 +212,11 @@ const ProfileEditPage = ({isSignup = false}) => {
               />
             </div>
           </div>
+          {!!errorMsg && (
+            <div className='error-msg'>
+              <span>{errorMsg}</span>
+            </div>
+          )}
         </div>
       </div>
     </div>

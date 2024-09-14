@@ -63,6 +63,10 @@ const Router = ({isAuthenticated}: RouterProps) => {
               element={<ProfilePage />}
             />
             <Route
+              path='/profile/:userId'
+              element={<ProfilePage />}
+            />
+            <Route
               path='/profile/edit'
               element={<ProfileEditPage />}
             />
