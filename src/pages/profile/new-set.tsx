@@ -24,7 +24,7 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 
-const ProfileEditPage = ({isSignup = false}) => {
+const ProfileNewSetPage = ({isSignup = false}) => {
   const {user, isNotSetProfile} = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
@@ -36,15 +36,29 @@ const ProfileEditPage = ({isSignup = false}) => {
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
   const [profileImage, setProfileImage] = useState<string | null>();
   const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string>("");
 
   const handleBack = async () => {
     navigate(-1);
   };
 
   const handleComplete = async (e: any) => {
-    const userRef = doc(db, "users", user!.uid);
+    if (!name) {
+      setErrorMsg("이름을 입력해주세요.");
+      return;
+    }
+    if (!userId) {
+      setErrorMsg("아이디를 입력해주세요");
+      return;
+    }
+    if (!intro) {
+      setErrorMsg("소개를 입력해주세요");
+      return;
+    }
+    const {uid} = location.state;
+    const userRef = doc(db, "users", uid);
     setIsUploading(true);
-    const key = `profiles/${user?.uid}/${uuidv4()}`;
+    const key = `profiles/${uid}/${uuidv4()}`;
     const storageRef = ref(storage, key);
     e.preventDefault();
     const userSnapshot = await getDoc(userRef);
@@ -53,42 +67,27 @@ const ProfileEditPage = ({isSignup = false}) => {
       if (profileImage) {
         const data = await uploadString(storageRef, profileImage, "data_url");
         imageUrl = await getDownloadURL(data?.ref);
+      } else {
+        setErrorMsg("프로필 이미지를 넣어주세요.");
+        return;
       }
-      await setDoc(
-        userRef,
-        {
-          name: name,
-          userId: userId,
-          introduction: intro,
-          isPrivate: isPrivate,
-          imageUrl: imageUrl,
-        },
-        {...(userSnapshot.exists() ? {merge: true} : {})}
-      );
+      await setDoc(userRef, {
+        name: name,
+        userId: userId,
+        introduction: intro,
+        isPrivate: isPrivate,
+        imageUrl: imageUrl,
+      });
       setProfileImage(null);
     } catch (error) {
-      toast.error("프로필 수정에 실패했습니다.");
+      toast.error("프로필 생성에 실패했습니다.");
+      return;
     }
     setIsUploading(false);
-    toast.success("프로필이 수정되었습니다.");
-    navigate(-1);
-  };
-
-  const setUserData = async () => {
-    const userRef = doc(db, "users", user!.uid);
-    const userSnapshot = await getDoc(userRef);
-    const userData = userSnapshot.data();
-    if (userData) {
-      setName(userData.name);
-      setUserId(userData.userId);
-      setIntro(userData.introduction);
-      setIsPrivate(userData.isPrivate);
-      console.log(userData.imageUrl);
-      setProfileImage(
-        userData.imageUrl ||
-          "https://firebasestorage.googleapis.com/v0/b/welshier.appspot.com/o/profiles%2Fdefault%2Fdefault-profile?alt=media&token=cc70557c-d6c7-4173-9e68-26f8b8fb2cc5"
-      );
-    }
+    const {email, password} = location.state || {};
+    await signInWithEmailAndPassword(getAuth(app), email, password);
+    toast.success("회원가입 되었습니다.");
+    navigate("/");
   };
 
   const handleProfileImageChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -102,6 +101,7 @@ const ProfileEditPage = ({isSignup = false}) => {
       }
     };
   };
+
   const handleProfileImage = () => {
     if (profileImageRef.current) {
       profileImageRef.current.click();
@@ -109,18 +109,16 @@ const ProfileEditPage = ({isSignup = false}) => {
   };
 
   useEffect(() => {
-    setUserData();
-  }, []);
+    if (!name || !userId || !intro) {
+      setErrorMsg("");
+    }
+  }, [name, userId, intro]);
 
   return (
     <div className='profile-edit'>
       <div className='profile-edit__appbar'>
         <div className='profile-edit__appbar-box-left'>
-          <AiOutlineClose
-            className='profile-edit__appbar-left'
-            onClick={handleBack}
-          />
-          <span>프로필 편집</span>
+          <span>프로필 생성</span>
         </div>
         <button
           className='profile-edit__appbar-right'
@@ -194,10 +192,15 @@ const ProfileEditPage = ({isSignup = false}) => {
               />
             </div>
           </div>
+          {!!errorMsg && (
+            <div className='error-msg'>
+              <span>{errorMsg}</span>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-export default ProfileEditPage;
+export default ProfileNewSetPage;

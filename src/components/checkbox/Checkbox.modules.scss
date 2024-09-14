@@ -1,0 +1,27 @@
+.checkbox {
+  border: none;
+  width: 50px;
+  height: 30px;
+  background-color: #ddd;
+  border-radius: 999px;
+  color: red;
+  padding: 2.5px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  transition: background-color 0.5s ease;
+  .circle {
+    background-color: white;
+    border-radius: 999px;
+    width: 25px;
+    height: 25px;
+    transition: transform 0.25s ease;
+  }
+  &.active {
+    background-color: black;
+    .circle {
+      transform: translateX(20px);
+    }
+  }
+}

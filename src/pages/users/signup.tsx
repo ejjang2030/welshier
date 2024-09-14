@@ -5,6 +5,8 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   AuthError,
+  updateProfile,
+  signOut,
 } from "firebase/auth";
 import {app} from "firebaseApp";
 import SignupForm from "components/users/SignupForm";
@@ -73,9 +75,19 @@ const SignupPage = () => {
   const handleSubmitSignup = async (e: any) => {
     e.preventDefault();
     try {
-      await createUserWithEmailAndPassword(getAuth(app), email, password);
-      navigate("/");
-      toast.success("회원가입이 완료되었습니다.");
+      createUserWithEmailAndPassword(getAuth(app), email, password)
+        .then(userCredential => {
+          signOut(getAuth(app)).then(() => {
+            navigate("/users/profile/set", {
+              state: {email, password, uid: userCredential.user.uid},
+            });
+          });
+        })
+        .catch(err => {
+          toast.error("로그인에 실패했습니다.");
+          navigate("/users/login");
+        });
+      // toast.success("회원가입이 완료되었습니다.");
     } catch (error: any) {
       if (error.code === "auth/invalid-email") {
         toast.error("이메일이 올바르지 않거나, 존재하는 이메일입니다.");
