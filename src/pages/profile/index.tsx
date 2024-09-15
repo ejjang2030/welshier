@@ -36,6 +36,7 @@ const ProfilePage = () => {
   const {user} = useContext(AuthContext);
   const location = useLocation();
   const [userData, setUserData] = useState<DocumentData | undefined>();
+  const [currProfileUserUid, setCurrProfileUserUid] = useState<string>("");
   const [myPosts, setMyPosts] = useState<PostProps[]>([]);
   const [likePosts, setLikePosts] = useState<PostProps[]>([]);
   const [isItMe, setIsItMe] = useState<boolean>(false);
@@ -53,39 +54,24 @@ const ProfilePage = () => {
   );
 
   useEffect(() => {
-    switch (currTab) {
-      case "threads":
-        break;
-      case "comments":
-        break;
-      case "reposts":
-        break;
-      default:
-        break;
-    }
-  }, [currTab]);
+    const currUserId = location.pathname.split("@")[1] as string;
+    getUidByUserId(currUserId, uid => {
+      setCurrProfileUserUid(uid);
+    });
+    getUserByUserId(currUserId).then(uData => {
+      setUserData(uData);
+    });
+  }, []);
 
   useEffect(() => {
-    if (user && user.uid) {
-      getUserByUid(user!.uid, uData => {
-        setUserData(uData);
-      });
-      const currUserId = location.pathname.split("@")[1] as string;
-      getUidByUserId(currUserId, uid => {
-        setIsItMe(uid === user!.uid);
-      });
-      getUserByUserId(currUserId).then(uData => {
-        setUserData(uData);
-      });
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (user) {
+    if (currProfileUserUid) {
+      if (user && user.uid) {
+        setIsItMe(currProfileUserUid === user!.uid);
+      }
       const postsRef = collection(db, "posts");
       const myPostQuery = query(
         postsRef,
-        where("uid", "==", user.uid),
+        where("uid", "==", currProfileUserUid),
         orderBy("createdAt", "desc")
       );
       onSnapshot(myPostQuery, snapshot => {
@@ -97,7 +83,7 @@ const ProfilePage = () => {
       });
       const likePostQuery = query(
         postsRef,
-        where("likes", "array-contains", user.uid),
+        where("likes", "array-contains", currProfileUserUid),
         orderBy("createdAt", "desc")
       );
       onSnapshot(likePostQuery, snapshot => {
@@ -108,7 +94,7 @@ const ProfilePage = () => {
         setLikePosts(dataObj as PostProps[]);
       });
     }
-  }, []);
+  }, [currProfileUserUid, user]);
 
   return (
     <div className='profile'>

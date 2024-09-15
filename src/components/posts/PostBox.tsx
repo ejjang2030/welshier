@@ -72,11 +72,16 @@ const PostBox = ({post}: {post: PostProps}) => {
           className='img'
           src={userImageUrl}
           alt=''
+          style={{cursor: "pointer"}}
+          onClick={() => navigate(`/profile/@${userId}`)}
         />
       </div>
       <div className='content'>
         <div className='profile-and-menu'>
-          <div className='profile'>
+          <div
+            className='profile'
+            style={{cursor: "pointer"}}
+            onClick={() => navigate(`/profile/@${userId}`)}>
             {userId}
             <span>{getTimeElapsed(new Date(post?.createdAt))}</span>
           </div>
