@@ -1,8 +1,12 @@
+import {useContext, useEffect, useState} from "react";
 import PostInput from "components/posts/PostInput";
-import { GiSittingDog } from "react-icons/gi";
-import { HiMenuAlt4 } from "react-icons/hi";
-import { Link } from "react-router-dom";
+import {GiSittingDog} from "react-icons/gi";
+import {HiMenuAlt4} from "react-icons/hi";
+import {Link, useNavigate} from "react-router-dom";
 import PostList from "components/posts/PostList";
+import AuthContext from "context/AuthContext";
+import {collection, onSnapshot, orderBy, query} from "firebase/firestore";
+import {db} from "firebaseApp";
 
 export interface PostProps {
   id: string;
@@ -10,10 +14,12 @@ export interface PostProps {
   content: string;
   createdAt: string;
   uid: string;
+  userId?: string;
   profileUrl?: string;
   likes?: string[];
   likeCount?: number;
   comments?: any;
+  hashtags?: string[];
 }
 
 interface User {
@@ -24,105 +30,53 @@ interface HomeProps {
   user: User;
 }
 
-const posts: PostProps[] = [
-  {
-    id: "1",
-    email: "ejjang2030@gmail.com",
-    content: "한번 만들어보겠습니다!\n만들기만들기",
-    createdAt: "2024-09-07",
-    likeCount: 111,
-    uid: "bTmDAGxyzwWR1imWno9x2IJE5jn2",
-  },
-  {
-    id: "2",
-    email: "ejjang2030@gmail.com",
-    content: "한번 만들어보겠습니다!2",
-    createdAt: "2024-09-07",
-    likeCount: 111,
-    uid: "bTmDAGxyzwWR1imWno9x2IJE5jn2",
-  },
-  {
-    id: "3",
-    email: "ejjang2030@gmail.com",
-    content: "한번 만들어보겠습니다!3",
-    createdAt: "2024-09-07",
-    likeCount: 111,
-    uid: "SQShlShJLWZyyKVnJQQlsntTlW72",
-  },
-  {
-    id: "4",
-    email: "ejjang2030@gmail.com",
-    content: "한번 만들어보겠습니다!4",
-    createdAt: "2024-09-07",
-    likeCount: 111,
-    uid: "SQShlShJLWZyyKVnJQQlsntTlW72",
-  },
-  {
-    id: "5",
-    email: "ejjang2030@gmail.com",
-    content: "한번 만들어보겠습니다!4",
-    createdAt: "2024-09-07",
-    likeCount: 111,
-    uid: "SQShlShJLWZyyKVnJQQlsntTlW72",
-  },
-  {
-    id: "6",
-    email: "ejjang2030@gmail.com",
-    content: "한번 만들어보겠습니다!4",
-    createdAt: "2024-09-07",
-    likeCount: 111,
-    uid: "SQShlShJLWZyyKVnJQQlsntTlW72",
-  },
-  {
-    id: "7",
-    email: "ejjang2030@gmail.com",
-    content: "한번 만들어보겠습니다!4",
-    createdAt: "2024-09-07",
-    likeCount: 111,
-    uid: "SQShlShJLWZyyKVnJQQlsntTlW72",
-  },
-  {
-    id: "8",
-    email: "ejjang2030@gmail.com",
-    content: "한번 만들어보겠습니다!4",
-    createdAt: "2024-09-07",
-    likeCount: 111,
-    uid: "SQShlShJLWZyyKVnJQQlsntTlW72",
-  },
-  {
-    id: "9",
-    email: "ejjang2030@gmail.com",
-    content: "한번 만들어보겠습니다!4",
-    createdAt: "2024-09-07",
-    likeCount: 111,
-    uid: "SQShlShJLWZyyKVnJQQlsntTlW72",
-  },
-];
-
 const HomePage = () => {
+  const navigate = useNavigate();
+  const {user} = useContext(AuthContext);
+  const [posts, setPosts] = useState<PostProps[] | undefined>();
+
   const handleFileUpload = () => {};
   const handleDelete = () => {};
   const handleEdit = () => {};
 
+  useEffect(() => {
+    if (user) {
+      const postsRef = collection(db, "posts");
+      const postsQuery = query(postsRef, orderBy("createdAt", "desc"));
+      onSnapshot(postsQuery, snapshot => {
+        let dataObj = snapshot.docs.map(doc => ({
+          ...doc.data(),
+          id: doc?.id,
+        }));
+        setPosts(dataObj as PostProps[]);
+      });
+    }
+  }, []);
+
   return (
-    <div className="home">
-      <div className="home__title">
-        <div className="home__title-left"></div>
-        <div className="home__title-logo">
-          <GiSittingDog className="home__title-logo-icon" />
+    <div className='home'>
+      <div className='home__title'>
+        <div className='home__title-left'></div>
+        <div className='home__title-logo'>
+          <GiSittingDog className='home__title-logo-icon' />
         </div>
-        <div className="home__title-right">
-          <Link to={`/posts`}>
-            <HiMenuAlt4 className="home__title-right-icon" />
-          </Link>
+        <div className='home__title-right'>
+          <HiMenuAlt4
+            className='home__title-right-icon'
+            onClick={() => navigate("/posts")}
+          />
         </div>
       </div>
       <PostInput />
-      <PostList
-        posts={posts}
-        handleDelete={handleDelete}
-        handleEdit={handleEdit}
-      />
+      {posts?.length ? (
+        <PostList
+          posts={posts}
+          handleDelete={handleDelete}
+          handleEdit={handleEdit}
+        />
+      ) : (
+        <>게시글이 없습니다.</>
+      )}
     </div>
   );
 };

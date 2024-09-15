@@ -11,6 +11,8 @@ $danger: #dc2626;
 $activeDanger: #dc26268e;
 $gray: #6b7280;
 
+$backgroundColor: #121212;
+
 $font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
   "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
 
@@ -19,7 +21,7 @@ body {
   font-family: $font;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: black;
+  background-color: $backgroundColor;
 }
 
 .layout {
@@ -73,6 +75,10 @@ body {
 .home {
   &__title {
     @extend .appbar;
+    position: sticky;
+    top: 0;
+    background-color: rgba(255, 255, 255, 0.884);
+    backdrop-filter: blur(2px);
     &-left {
       @extend .appbar-icon;
     }
@@ -83,8 +89,12 @@ body {
       }
     }
     &-right {
+      @extend .flex-row;
+      justify-content: center;
+      align-items: center;
       &-icon {
         @extend .appbar-icon;
+        color: #121212;
       }
     }
   }
@@ -108,6 +118,22 @@ body {
     &:focus {
       background-color: $activeBg;
       color: $text-color-hover;
+    }
+  }
+}
+
+.hashtag-list {
+  @extend .flex-row;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  font-family: $font;
+  font-style: italic;
+  color: rgb(70, 131, 184);
+  .item {
+    &:hover,
+    &:focus {
+      color: rgb(49, 93, 132);
+      font-weight: 600;
     }
   }
 }
@@ -155,6 +181,15 @@ body {
           &::placeholder {
             font-family: $font;
             color: #9c9c9c;
+          }
+        }
+        &-hashtags {
+          @extend .flex-column;
+          gap: 8px;
+
+          .hashtag-input {
+            border: none;
+            font-family: $font;
           }
         }
       }
@@ -685,6 +720,7 @@ body {
   @extend .flex-row;
   gap: 16px;
   border-bottom: 0.5px solid #ddd;
+  box-sizing: border-box;
   .image {
     .img {
       width: 40px;
@@ -698,11 +734,13 @@ body {
     @extend .flex-column;
     gap: 8px;
     width: 100%;
+    box-sizing: border-box;
     .profile-and-menu {
       @extend .flex-row;
       justify-content: space-between;
       align-items: center;
       width: 100%;
+      box-sizing: border-box;
       .profile {
         @extend .flex-row;
         gap: 4px;
@@ -716,6 +754,8 @@ body {
         }
       }
       .menu {
+        @extend .flex-row;
+        gap: 4px;
         .icon {
           color: #5f5e5e;
         }
@@ -723,9 +763,19 @@ body {
     }
   }
   .body {
+    @extend .flex-column;
+    gap: 16px;
     font-family: $font;
     font-size: 16px;
     font-weight: 400;
+    box-sizing: border-box;
+    width: 100%;
+    text-overflow: ellipsis;
+    word-break: break-all;
+    p {
+      margin: 0;
+      white-space: pre-wrap;
+    }
   }
   .post-footer {
     margin: 8px 0 0;

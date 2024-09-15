@@ -1,29 +1,29 @@
-import { MouseEvent } from "react";
-import { useNavigate } from "react-router-dom";
-import { FaPlus } from "react-icons/fa";
-import { FaRegHeart } from "react-icons/fa";
+import {MouseEvent} from "react";
+import {useNavigate} from "react-router-dom";
+import {FaPlus} from "react-icons/fa";
+import {FaRegHeart} from "react-icons/fa";
 
 // home icon
-import { GoHome as HomeIconOutline } from "react-icons/go";
-import { GoHomeFill as HomeIconFill } from "react-icons/go";
+import {GoHome as HomeIconOutline} from "react-icons/go";
+import {GoHomeFill as HomeIconFill} from "react-icons/go";
 // search icon
-import { GoSearch as SearchIcon } from "react-icons/go";
+import {GoSearch as SearchIcon} from "react-icons/go";
 // plus icon
-import { GoPlus as PlusIcon } from "react-icons/go";
+import {GoPlus as PlusIcon} from "react-icons/go";
 // heart icon
-import { GoHeart as HeartIconOutline } from "react-icons/go";
-import { GoHeartFill as HeartIconFill } from "react-icons/go";
+import {GoHeart as HeartIconOutline} from "react-icons/go";
+import {GoHeartFill as HeartIconFill} from "react-icons/go";
 // profile icon
-import { GoPersonFill as ProfileIconFill } from "react-icons/go";
-import { GoPerson as ProfileIconOutline } from "react-icons/go";
-import { useContext, useState } from "react";
+import {GoPersonFill as ProfileIconFill} from "react-icons/go";
+import {GoPerson as ProfileIconOutline} from "react-icons/go";
+import {useContext, useState} from "react";
 import AuthContext from "context/AuthContext";
-import { getUserIdByUid } from "utils/UserUtils";
+import {getUserIdByUid} from "utils/UserUtils";
 
 type Tabs = "home" | "search" | "add-post" | "notifications" | "profile";
 
 const MenuList = () => {
-  const { user } = useContext(AuthContext);
+  const {user} = useContext(AuthContext);
   const navigate = useNavigate();
   const [currTab, setCurrTab] = useState<Tabs>("home");
 
@@ -47,7 +47,7 @@ const MenuList = () => {
         break;
       }
       case "profile": {
-        getUserIdByUid(user!.uid, (userId) => {
+        getUserIdByUid(user!.uid, userId => {
           navigate(`/profile/@${userId}`);
         });
         break;
@@ -56,58 +56,53 @@ const MenuList = () => {
   };
 
   return (
-    <div className="footer">
-      <div className="footer__grid">
+    <div className='footer'>
+      <div className='footer__grid'>
         <button
-          type="button"
-          className="button"
-          id="home"
-          onClick={(e) => handleClick(e, "home")}
-        >
+          type='button'
+          className='button'
+          id='home'
+          onClick={e => handleClick(e, "home")}>
           {currTab === "home" ? (
-            <HomeIconFill className="icon" />
+            <HomeIconFill className='icon' />
           ) : (
-            <HomeIconOutline className="icon" />
+            <HomeIconOutline className='icon' />
           )}
         </button>
         <button
-          type="button"
-          className="button"
-          id="search"
-          onClick={(e) => handleClick(e, "search")}
-        >
-          <SearchIcon className="icon" />
+          type='button'
+          className='button'
+          id='search'
+          onClick={e => handleClick(e, "search")}>
+          <SearchIcon className='icon' />
         </button>
         <button
-          type="button"
-          className="button button__main-plus"
-          id="add-post"
-          onClick={(e) => handleClick(e, "add-post")}
-        >
-          <PlusIcon className="icon" />
+          type='button'
+          className='button button__main-plus'
+          id='add-post'
+          onClick={e => handleClick(e, "add-post")}>
+          <PlusIcon className='icon' />
         </button>
         <button
-          type="button"
-          className="button"
-          id="notifications"
-          onClick={(e) => handleClick(e, "notifications")}
-        >
+          type='button'
+          className='button'
+          id='notifications'
+          onClick={e => handleClick(e, "notifications")}>
           {currTab === "notifications" ? (
-            <HeartIconFill className="icon" />
+            <HeartIconFill className='icon' />
           ) : (
-            <HeartIconOutline className="icon" />
+            <HeartIconOutline className='icon' />
           )}
         </button>
         <button
-          type="button"
-          className="button"
-          id="profile"
-          onClick={(e) => handleClick(e, "profile")}
-        >
+          type='button'
+          className='button'
+          id='profile'
+          onClick={e => handleClick(e, "profile")}>
           {currTab === "profile" ? (
-            <ProfileIconFill className="icon" />
+            <ProfileIconFill className='icon' />
           ) : (
-            <ProfileIconOutline className="icon" />
+            <ProfileIconOutline className='icon' />
           )}
         </button>
       </div>
