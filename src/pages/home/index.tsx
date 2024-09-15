@@ -35,10 +35,6 @@ const HomePage = () => {
   const {user} = useContext(AuthContext);
   const [posts, setPosts] = useState<PostProps[] | undefined>();
 
-  const handleFileUpload = () => {};
-  const handleDelete = () => {};
-  const handleEdit = () => {};
-
   useEffect(() => {
     if (user) {
       const postsRef = collection(db, "posts");
@@ -68,15 +64,7 @@ const HomePage = () => {
         </div>
       </div>
       <PostInput />
-      {posts?.length ? (
-        <PostList
-          posts={posts}
-          handleDelete={handleDelete}
-          handleEdit={handleEdit}
-        />
-      ) : (
-        <>게시글이 없습니다.</>
-      )}
+      {posts?.length ? <PostList posts={posts} /> : <>게시글이 없습니다.</>}
     </div>
   );
 };

@@ -1,4 +1,7 @@
-import {BsHeart as HeartIconOutline} from "react-icons/bs";
+import {
+  BsHeart as HeartIconOutline,
+  BsHeartFill as HeartIconFill,
+} from "react-icons/bs";
 import {BsChat as ChatIcon} from "react-icons/bs";
 import {BsThreeDots as ThreeDotsIcon} from "react-icons/bs";
 import {MdOutlineInput as RepostIcon} from "react-icons/md";
@@ -11,9 +14,16 @@ import {PostProps} from "pages/home";
 import {getUserByUid, getUserIdByUid} from "utils/UserUtils";
 import "./Post.module.scss";
 import {useNavigate} from "react-router-dom";
-import {deleteDoc, doc} from "firebase/firestore";
+import {
+  arrayRemove,
+  arrayUnion,
+  deleteDoc,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
 import {db} from "firebaseApp";
 import {toast} from "react-toastify";
+import {getTimeElapsed} from "utils/TimeUtils";
 
 const PostBox = ({post}: {post: PostProps}) => {
   const navigate = useNavigate();
@@ -35,19 +45,40 @@ const PostBox = ({post}: {post: PostProps}) => {
     toast.success("게시글을 삭제했습니다.");
   };
 
+  const handleToggleLike = async (e: any) => {
+    const likeRef = doc(db, "posts", post.id);
+
+    if (user?.uid && post.likes?.includes(user!.uid)) {
+      // 취소
+      await updateDoc(likeRef, {
+        likes: arrayRemove(user.uid),
+        likeCount: post?.likeCount ? post?.likeCount - 1 : 0,
+      });
+    } else {
+      // 좋아요를 누른다.
+      if (user?.uid) {
+        await updateDoc(likeRef, {
+          likes: arrayUnion(user.uid),
+          likeCount: post?.likeCount ? post?.likeCount + 1 : 1,
+        });
+      }
+    }
+  };
+
   return (
     <div className='post-box'>
       <div className='image'>
         <img
           className='img'
           src={userImageUrl}
+          alt=''
         />
       </div>
       <div className='content'>
         <div className='profile-and-menu'>
           <div className='profile'>
             {userId}
-            <span>2주</span>
+            <span>{getTimeElapsed(new Date(post?.createdAt))}</span>
           </div>
           <div className='menu'>
             {user?.uid === post?.uid && (
@@ -79,17 +110,19 @@ const PostBox = ({post}: {post: PostProps}) => {
         </div>
         <div className='post-footer'>
           <div className='icons'>
-            <div className='likes-btn'>
-              <HeartIconOutline className='icon' />
-              <span>{post.likeCount}</span>
+            <div
+              className='likes-btn'
+              onClick={handleToggleLike}>
+              {user && post.likes?.includes(user!.uid) ? (
+                <HeartIconFill className='icon' />
+              ) : (
+                <HeartIconOutline className='icon' />
+              )}
+              <span>{post.likeCount || 0}</span>
             </div>
             <div className='comments-btn'>
               <ChatIcon className='icon' />
               <span>{post.comments?.length || 0}</span>
-            </div>
-            <div className='reposts-btn'>
-              <RepostIcon className='icon' />
-              <span>1</span>
             </div>
             <div className='send-btn'>
               <SendIcon className='icon' />

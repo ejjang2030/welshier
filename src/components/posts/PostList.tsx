@@ -5,11 +5,9 @@ import {PostProps} from "pages/home";
 import PostBox from "./PostBox";
 interface PostListProps {
   posts: PostProps[] | undefined;
-  handleDelete: () => void;
-  handleEdit: () => void;
 }
 
-const PostList = ({posts, handleDelete, handleEdit}: PostListProps) => {
+const PostList = ({posts}: PostListProps) => {
   return (
     <div className='post'>
       {posts?.map(post => (

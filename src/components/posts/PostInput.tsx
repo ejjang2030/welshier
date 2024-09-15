@@ -74,10 +74,10 @@ const PostInput = ({isEdit = false}: {isEdit?: boolean}) => {
       } else {
         await addDoc(collection(db, "posts"), {
           content: content,
-          createdAt: new Date()?.toLocaleDateString("ko", {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
+          createdAt: new Date()?.toLocaleDateString("en", {
+            hour: "numeric",
+            minute: "numeric",
+            second: "numeric",
           }),
           uid: user?.uid,
           userId: userData?.userId,
