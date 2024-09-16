@@ -1,44 +1,37 @@
-import {useState, useEffect, useCallback, useContext} from "react";
+import {useState, useEffect, useCallback, useContext, useMemo} from "react";
 
 import {GoGlobe as GlobalIcon} from "react-icons/go";
 import {BsList as MenuIcon} from "react-icons/bs";
 import {useLocation, useNavigate} from "react-router-dom";
-import PostBox from "components/posts/PostBox";
 import AuthContext from "context/AuthContext";
 import {
-  checkDuplicatedUserId,
-  getUidByUserId,
-  getUserByUid,
-  getUserByUserId,
+  getTwoUserImageUrlsFromFollowers,
+  getUserDataByUserId,
 } from "utils/UserUtils";
 
 import {
+  arrayRemove,
+  arrayUnion,
   collection,
-  DocumentData,
+  doc,
   onSnapshot,
   orderBy,
   query,
+  setDoc,
+  updateDoc,
   where,
 } from "firebase/firestore";
-import {PostProps} from "pages/home";
 import {db} from "firebaseApp";
 import PostList from "components/posts/PostList";
-
-interface UserData {
-  name: string;
-  userId: string;
-  introduction: string;
-  isPrivate: boolean;
-  imageUrl: string;
-}
+import {Follower, Post, UserData} from "types";
 
 const ProfilePage = () => {
   const {user} = useContext(AuthContext);
   const location = useLocation();
-  const [userData, setUserData] = useState<DocumentData | undefined>();
-  const [currProfileUserUid, setCurrProfileUserUid] = useState<string>("");
-  const [myPosts, setMyPosts] = useState<PostProps[]>([]);
-  const [likePosts, setLikePosts] = useState<PostProps[]>([]);
+  const [userData, setUserData] = useState<UserData | undefined>();
+  const [myPosts, setMyPosts] = useState<Post[]>([]);
+  const [likePosts, setLikePosts] = useState<Post[]>([]);
+  const [followers, setFollowers] = useState<Follower[]>([]);
   const [isItMe, setIsItMe] = useState<boolean>(false);
   const navigate = useNavigate();
   const [currTab, setCurrTab] = useState<"threads" | "comments" | "reposts">(
@@ -53,25 +46,78 @@ const ProfilePage = () => {
     [currTab]
   );
 
+  const handleCancelFollow = useCallback(
+    async (e: any) => {
+      e.preventDefault();
+      if (user && user.uid && userData) {
+        const followingsRef = doc(db, "followings", user.uid);
+        await updateDoc(followingsRef, {
+          users: arrayRemove({id: userData.uid}),
+        });
+        const followersRef = doc(db, "followers", userData.uid);
+        await updateDoc(followersRef, {
+          users: arrayRemove({id: user.uid}),
+        });
+      }
+    },
+    [userData, user]
+  );
+
+  const handleFollow = useCallback(
+    async (e: any) => {
+      e.preventDefault();
+      if (user && user.uid && userData) {
+        // 현재 로그인된 사용자가 해당 프로필의 사용자를 팔로우하는 로직
+        const followingsRef = doc(db, "followings", user.uid);
+        await setDoc(
+          followingsRef,
+          {users: arrayUnion({id: userData.uid})},
+          {merge: true}
+        );
+        // 해당 프로필의 사용자가 현재 로그인된 사용자를 팔로잉 당하는 로직
+        const followersRef = doc(db, "followers", userData.uid);
+        await setDoc(
+          followersRef,
+          {users: arrayUnion({id: user.uid})},
+          {merge: true}
+        );
+      }
+    },
+    [userData, user]
+  );
+
   useEffect(() => {
     const currUserId = location.pathname.split("@")[1] as string;
-    getUidByUserId(currUserId, uid => {
-      setCurrProfileUserUid(uid);
-    });
-    getUserByUserId(currUserId).then(uData => {
+    getUserDataByUserId(currUserId).then(uData => {
       setUserData(uData);
     });
   }, []);
 
+  const isFollow = useMemo(() => {
+    return user && followers.map(follower => follower.id).includes(user.uid);
+  }, [user, followers]);
+
   useEffect(() => {
-    if (currProfileUserUid) {
+    if (userData) {
+      // 현재 프로필의 사용자와 로그인해서 접속된 사용자의 일치여부 판단
       if (user && user.uid) {
-        setIsItMe(currProfileUserUid === user!.uid);
+        setIsItMe(userData.uid === user!.uid);
       }
+
+      // 현재 프로필의 사용자를 팔로우한 사람들의 목록 조회
+      const followersRef = doc(db, "followers", userData.uid);
+      onSnapshot(followersRef, doc => {
+        setFollowers([]);
+        doc?.data()?.users?.map((user: Follower) => {
+          setFollowers(prev => (prev ? [...prev, {id: user.id}] : []));
+        });
+      });
+
+      // 현재 프로필의 사용자가 게시한 글 목록 조회
       const postsRef = collection(db, "posts");
       const myPostQuery = query(
         postsRef,
-        where("uid", "==", currProfileUserUid),
+        where("uid", "==", userData.uid),
         orderBy("createdAt", "desc")
       );
       onSnapshot(myPostQuery, snapshot => {
@@ -79,11 +125,13 @@ const ProfilePage = () => {
           ...doc.data(),
           id: doc?.id,
         }));
-        setMyPosts(dataObj as PostProps[]);
+        setMyPosts(dataObj as Post[]);
       });
+
+      // 현재 프로필의 사용자가 좋아요를 표시한 게시글 목록 조회
       const likePostQuery = query(
         postsRef,
-        where("likes", "array-contains", currProfileUserUid),
+        where("likes", "array-contains", userData.uid),
         orderBy("createdAt", "desc")
       );
       onSnapshot(likePostQuery, snapshot => {
@@ -91,10 +139,16 @@ const ProfilePage = () => {
           ...doc.data(),
           id: doc?.id,
         }));
-        setLikePosts(dataObj as PostProps[]);
+        setLikePosts(dataObj as Post[]);
       });
     }
-  }, [currProfileUserUid, user]);
+  }, [userData, user]);
+
+  useEffect(() => {
+    if (followers) {
+      getTwoUserImageUrlsFromFollowers(followers, () => {});
+    }
+  }, [followers]);
 
   return (
     <div className='profile'>
@@ -123,7 +177,7 @@ const ProfilePage = () => {
             <div className='img1'></div>
             <div className='img2'></div>
           </div>
-          <div className='followers'>팔로워 66명</div>
+          <div className='followers'>팔로워 {followers.length || 0}명</div>
         </div>
         <div className='profile__my-profile-buttons'>
           {isItMe ? (
@@ -131,11 +185,21 @@ const ProfilePage = () => {
               프로필 편집
             </button>
           ) : (
-            <button
-              className='follow-btn'
-              onClick={() => console.log("follow")}>
-              팔로우
-            </button>
+            <>
+              {isFollow ? (
+                <button
+                  className='followed-btn'
+                  onClick={handleCancelFollow}>
+                  팔로잉
+                </button>
+              ) : (
+                <button
+                  className='follow-btn'
+                  onClick={handleFollow}>
+                  팔로우
+                </button>
+              )}
+            </>
           )}
 
           <button>프로필 공유</button>

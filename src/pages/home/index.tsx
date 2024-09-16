@@ -7,33 +7,12 @@ import PostList from "components/posts/PostList";
 import AuthContext from "context/AuthContext";
 import {collection, onSnapshot, orderBy, query} from "firebase/firestore";
 import {db} from "firebaseApp";
-
-export interface PostProps {
-  id: string;
-  email: string;
-  content: string;
-  createdAt: string;
-  uid: string;
-  userId?: string;
-  profileUrl?: string;
-  likes?: string[];
-  likeCount?: number;
-  comments?: any;
-  hashtags?: string[];
-}
-
-interface User {
-  uid: string;
-}
-
-interface HomeProps {
-  user: User;
-}
+import {Post} from "types";
 
 const HomePage = () => {
   const navigate = useNavigate();
   const {user} = useContext(AuthContext);
-  const [posts, setPosts] = useState<PostProps[] | undefined>();
+  const [posts, setPosts] = useState<Post[] | undefined>();
 
   useEffect(() => {
     if (user) {
@@ -44,7 +23,7 @@ const HomePage = () => {
           ...doc.data(),
           id: doc?.id,
         }));
-        setPosts(dataObj as PostProps[]);
+        setPosts(dataObj as Post[]);
       });
     }
   }, []);

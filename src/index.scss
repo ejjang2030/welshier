@@ -565,6 +565,16 @@ body {
         &.follow-btn {
           background-color: black;
           color: white;
+          &:hover,
+          &:focus {
+            background-color: rgb(47, 47, 47);
+          }
+        }
+        &.followed-btn {
+          background-color: white;
+          color: #ddd;
+          border-radius: 8px;
+          border: 1px solid #ddd;
         }
       }
     }

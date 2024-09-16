@@ -8,16 +8,15 @@ import {LuImage} from "react-icons/lu";
 import {MdOutlinePhotoCamera} from "react-icons/md";
 import {useContext} from "react";
 import AuthContext from "context/AuthContext";
-import {getUserByUid} from "utils/UserUtils";
+import {getUserDataByUid} from "utils/UserUtils";
 import {addDoc, collection, doc, getDoc, updateDoc} from "firebase/firestore";
 import {db} from "firebaseApp";
 import {toast} from "react-toastify";
-import {PostProps} from "pages/home";
-import HashtagEditor from "components/input/HashtagEditor";
+import {Post} from "types";
 
 const PostInput = ({isEdit = false}: {isEdit?: boolean}) => {
   const {id: postId} = useParams();
-  const [post, setPost] = useState<PostProps | null>(null);
+  const [post, setPost] = useState<Post | null>(null);
   const navigate = useNavigate();
   const {user} = useContext(AuthContext);
   const [content, setContent] = useState<string>("");
@@ -100,7 +99,7 @@ const PostInput = ({isEdit = false}: {isEdit?: boolean}) => {
     if (postId) {
       const postRef = doc(db, "posts", postId);
       const postSnapshot = await getDoc(postRef);
-      setPost({...(postSnapshot.data() as PostProps), id: postSnapshot.id});
+      setPost({...(postSnapshot.data() as Post), id: postSnapshot.id});
       setContent(postSnapshot?.data()?.content);
       setHashtags(postSnapshot?.data()?.hashtags || []);
     }
@@ -112,7 +111,7 @@ const PostInput = ({isEdit = false}: {isEdit?: boolean}) => {
 
   useEffect(() => {
     if (user) {
-      getUserByUid(user.uid, uData => {
+      getUserDataByUid(user.uid, uData => {
         setUserData(uData);
       });
     }

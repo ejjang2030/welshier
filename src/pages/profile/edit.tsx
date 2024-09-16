@@ -1,33 +1,21 @@
-import { useState, useEffect, useRef, ChangeEvent } from "react";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { AiOutlineClose as CloseIcon } from "react-icons/ai";
-import "./Profile.module.scss";
+import {useState, useEffect, useRef, ChangeEvent} from "react";
+import {useLocation, useNavigate} from "react-router-dom";
+import {AiOutlineClose as CloseIcon} from "react-icons/ai";
 import Checkbox from "components/checkbox/Checkbox";
-import {
-  doc,
-  getDoc,
-  setDoc,
-  query,
-  collection,
-  where,
-} from "firebase/firestore";
-import { app, db, storage } from "firebaseApp";
-import { useContext } from "react";
+import {doc, getDoc, setDoc} from "firebase/firestore";
+import {db, storage} from "firebaseApp";
+import {useContext} from "react";
 import AuthContext from "context/AuthContext";
-import { toast } from "react-toastify";
-import { checkDuplicatedUserId, getUserByUserId } from "utils/UserUtils";
-import { v4 as uuidv4 } from "uuid";
-import { getDownloadURL, ref, uploadString } from "firebase/storage";
-import {
-  getAuth,
-  signInWithCredential,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import {toast} from "react-toastify";
+import {checkDuplicatedUserId} from "utils/UserUtils";
+import {v4 as uuidv4} from "uuid";
+import {getDownloadURL, ref, uploadString} from "firebase/storage";
 
-const ProfileEditPage = ({ isSignup = false }) => {
-  const { user, isNotSetProfile } = useContext(AuthContext);
+import "./Profile.module.scss";
+
+const ProfileEditPage = () => {
+  const {user} = useContext(AuthContext);
   const navigate = useNavigate();
-  const location = useLocation();
 
   const profileImageRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState<string>("");
@@ -72,24 +60,25 @@ const ProfileEditPage = ({ isSignup = false }) => {
         const data = await uploadString(storageRef, profileImage, "data_url");
         imageUrl = await getDownloadURL(data?.ref);
       }
-      await setDoc(
-        userRef,
-        {
-          name: name,
-          userId: userId,
-          introduction: intro,
-          isPrivate: isPrivate,
-          imageUrl: imageUrl,
-        },
-        { ...(userSnapshot.exists() ? { merge: true } : {}) }
-      );
+      const modifiedUserData = {
+        uid: user?.uid,
+        email: user?.email,
+        name: name,
+        userId: userId,
+        introduction: intro,
+        isPrivate: isPrivate,
+        imageUrl: imageUrl,
+      };
+      await setDoc(userRef, modifiedUserData, {
+        ...(userSnapshot.exists() ? {merge: true} : {}),
+      });
       setProfileImage(null);
+      setIsUploading(false);
+      toast.success("프로필이 수정되었습니다.");
+      navigate(-1);
     } catch (error) {
       toast.error("프로필 수정에 실패했습니다.");
     }
-    setIsUploading(false);
-    toast.success("프로필이 수정되었습니다.");
-    navigate(-1);
   };
 
   const setUserData = async () => {
@@ -131,85 +120,89 @@ const ProfileEditPage = ({ isSignup = false }) => {
   }, []);
 
   return (
-    <div className="profile-edit">
-      <div className="profile-edit__appbar">
-        <div className="profile-edit__appbar-box-left">
+    <div className='profile-edit'>
+      <div className='profile-edit__appbar'>
+        <div className='profile-edit__appbar-box-left'>
           <CloseIcon
-            className="profile-edit__appbar-left"
+            className='profile-edit__appbar-left'
             onClick={handleBack}
           />
           <span>프로필 편집</span>
         </div>
-        <button className="profile-edit__appbar-right" onClick={handleComplete}>
+        <button
+          className='profile-edit__appbar-right'
+          onClick={handleComplete}>
           <span>완료</span>
         </button>
       </div>
-      <div className="profile-edit__body">
-        <div className="profile-edit__body-box">
-          <div className="profile-edit__body-box-name-and-image">
-            <div className="name">
+      <div className='profile-edit__body'>
+        <div className='profile-edit__body-box'>
+          <div className='profile-edit__body-box-name-and-image'>
+            <div className='name'>
               <span>이름</span>
               <input
-                placeholder="이름을 입력해주세요."
+                placeholder='이름을 입력해주세요.'
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={e => setName(e.target.value)}
               />
             </div>
-            <div className="image" onClick={handleProfileImage}>
+            <div
+              className='image'
+              onClick={handleProfileImage}>
               <img
-                className="img"
+                className='img'
                 src={
                   profileImage ||
                   "https://firebasestorage.googleapis.com/v0/b/welshier.appspot.com/o/profiles%2Fdefault%2Fdefault-profile?alt=media&token=cc70557c-d6c7-4173-9e68-26f8b8fb2cc5"
                 }
-                alt=""
+                alt=''
               />
               <input
-                type="file"
+                type='file'
                 ref={profileImageRef}
-                accept="image/*"
+                accept='image/*'
                 onChange={handleProfileImageChange}
-                style={{ display: "none" }}
+                style={{display: "none"}}
               />
             </div>
           </div>
-          <div className="profile-edit__body-box-id">
-            <div className="id">
+          <div className='profile-edit__body-box-id'>
+            <div className='id'>
               <span>아이디</span>
               <input
-                placeholder="아이디를 입력해주세요."
+                placeholder='아이디를 입력해주세요.'
                 value={userId}
-                onChange={(e) => setUserId(e.target.value)}
+                onChange={e => setUserId(e.target.value)}
               />
             </div>
           </div>
-          <div className="profile-edit__body-box-introduce">
-            <div className="introduce">
+          <div className='profile-edit__body-box-introduce'>
+            <div className='introduce'>
               <span>소개</span>
               <input
-                placeholder="소개를 입력해주세요."
+                placeholder='소개를 입력해주세요.'
                 value={intro}
-                onChange={(e) => setIntro(e.target.value)}
+                onChange={e => setIntro(e.target.value)}
               />
             </div>
           </div>
-          <div className="profile-edit__body-box-private-profile">
-            <div className="private-profile">
+          <div className='profile-edit__body-box-private-profile'>
+            <div className='private-profile'>
               <span>비공개 프로필</span>
-              <span className="info">
+              <span className='info'>
                 비공개 프로필로 전환하면 상대방이 회원님을 팔로우하지 않는 한
                 다른 사람에게 답글을 남길 수 없게 됩니다.
               </span>
             </div>
-            <div className="image">
+            <div className='image'>
               <Checkbox
-                onClick={(isTrue) => setIsPrivate(isTrue)}
+                onClick={isTrue => setIsPrivate(isTrue)}
                 isChecked={isPrivate}
               />
             </div>
           </div>
           {!!errorMsg && (
-            <div className="error-msg">
+            <div className='error-msg'>
               <span>{errorMsg}</span>
             </div>
           )}

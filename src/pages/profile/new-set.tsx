@@ -1,48 +1,35 @@
 import {useState, useEffect, useRef, ChangeEvent} from "react";
-import {useLocation, useNavigate, useSearchParams} from "react-router-dom";
-import {AiOutlineClose} from "react-icons/ai";
-import "./Profile.module.scss";
-import Checkbox from "components/checkbox/Checkbox";
-import {
-  doc,
-  getDoc,
-  setDoc,
-  query,
-  collection,
-  where,
-} from "firebase/firestore";
-import {app, db, storage} from "firebaseApp";
-import {useContext} from "react";
-import AuthContext from "context/AuthContext";
-import {toast} from "react-toastify";
-import {checkDuplicatedUserId, getUserByUserId} from "utils/UserUtils";
-import {v4 as uuidv4} from "uuid";
-import {getDownloadURL, ref, uploadString} from "firebase/storage";
-import {
-  getAuth,
-  signInWithCredential,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import {useLocation, useNavigate} from "react-router-dom";
 
-const ProfileNewSetPage = ({isSignup = false}) => {
-  const {user, isNotSetProfile} = useContext(AuthContext);
+import {getDownloadURL, ref, uploadString} from "firebase/storage";
+import {getAuth, signInWithEmailAndPassword} from "firebase/auth";
+import {doc, setDoc} from "firebase/firestore";
+import {app, db, storage} from "firebaseApp";
+
+import {toast} from "react-toastify";
+import {v4 as uuidv4} from "uuid";
+
+import {checkDuplicatedUserId} from "utils/UserUtils";
+import Checkbox from "components/checkbox/Checkbox";
+
+import "./Profile.module.scss";
+
+const ProfileNewSetPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const profileImageRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState<string>("");
   const [userId, setUserId] = useState<string>("");
   const [intro, setIntro] = useState<string>("");
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
   const [profileImage, setProfileImage] = useState<string | null>();
-  const [isUploading, setIsUploading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string>("");
 
-  const handleBack = async () => {
-    navigate(-1);
-  };
+  const profileImageRef = useRef<HTMLInputElement>(null);
 
-  const handleComplete = async (e: any) => {
+  const createUserData = async (e: any) => {
+    e.preventDefault();
+    // Validation
     if (!name) {
       setErrorMsg("이름을 입력해주세요.");
       return;
@@ -52,23 +39,22 @@ const ProfileNewSetPage = ({isSignup = false}) => {
       return;
     }
     const isDuplicatedUserId = await checkDuplicatedUserId(userId);
-    if(isDuplicatedUserId) {
-      setErrorMsg('중복된 아이디가 존재합니다.');
+    if (isDuplicatedUserId) {
+      setErrorMsg("중복된 아이디가 존재합니다.");
       return;
     }
     if (!intro) {
       setErrorMsg("소개를 입력해주세요");
       return;
     }
-    const {uid} = location.state;
-    const userRef = doc(db, "users", uid);
-    setIsUploading(true);
+
+    const {uid, email, password} = location.state || {};
+
+    // 사용자 프로필 이미지 업로드
     const key = `profiles/${uid}/${uuidv4()}`;
     const storageRef = ref(storage, key);
-    e.preventDefault();
-    const userSnapshot = await getDoc(userRef);
+    let imageUrl = "";
     try {
-      let imageUrl = "";
       if (profileImage) {
         const data = await uploadString(storageRef, profileImage, "data_url");
         imageUrl = await getDownloadURL(data?.ref);
@@ -76,26 +62,46 @@ const ProfileNewSetPage = ({isSignup = false}) => {
         setErrorMsg("프로필 이미지를 넣어주세요.");
         return;
       }
-      await setDoc(userRef, {
+    } catch (error) {
+      setErrorMsg("프로필 이미지를 업로드하는데 실패하였습니다.");
+      return;
+    } finally {
+      setProfileImage(null);
+    }
+    if (!imageUrl) {
+      setErrorMsg("프로필 이미지가 인식되지 않았습니다.");
+      return;
+    }
+
+    // 사용자 정보 입력하고 회원가입
+    try {
+      const userRef = doc(db, "users", uid);
+      const newUserData = {
+        uid: uid,
+        email: email,
         name: name,
         userId: userId,
         introduction: intro,
         isPrivate: isPrivate,
         imageUrl: imageUrl,
-      });
-      setProfileImage(null);
+      };
+      await setDoc(userRef, newUserData);
+      await signInWithEmailAndPassword(getAuth(app), email, password);
+      toast.success("회원가입 되었습니다.");
+      navigate("/");
     } catch (error) {
       toast.error("프로필 생성에 실패했습니다.");
       return;
     }
-    setIsUploading(false);
-    const {email, password} = location.state || {};
-    await signInWithEmailAndPassword(getAuth(app), email, password);
-    toast.success("회원가입 되었습니다.");
-    navigate("/");
   };
 
-  const handleProfileImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const onClickProfileImage = () => {
+    if (profileImageRef.current) {
+      profileImageRef.current.click();
+    }
+  };
+
+  const changeProfileImage = (e: ChangeEvent<HTMLInputElement>) => {
     const image = e.target.files?.[0];
     const fileReader = new FileReader();
     fileReader?.readAsDataURL(image!);
@@ -105,12 +111,6 @@ const ProfileNewSetPage = ({isSignup = false}) => {
         setProfileImage(result);
       }
     };
-  };
-
-  const handleProfileImage = () => {
-    if (profileImageRef.current) {
-      profileImageRef.current.click();
-    }
   };
 
   useEffect(() => {
@@ -127,7 +127,7 @@ const ProfileNewSetPage = ({isSignup = false}) => {
         </div>
         <button
           className='profile-edit__appbar-right'
-          onClick={handleComplete}>
+          onClick={createUserData}>
           <span>완료</span>
         </button>
       </div>
@@ -144,7 +144,7 @@ const ProfileNewSetPage = ({isSignup = false}) => {
             </div>
             <div
               className='image'
-              onClick={handleProfileImage}>
+              onClick={onClickProfileImage}>
               <img
                 className='img'
                 src={
@@ -157,7 +157,7 @@ const ProfileNewSetPage = ({isSignup = false}) => {
                 type='file'
                 ref={profileImageRef}
                 accept='image/*'
-                onChange={handleProfileImageChange}
+                onChange={changeProfileImage}
                 style={{display: "none"}}
               />
             </div>

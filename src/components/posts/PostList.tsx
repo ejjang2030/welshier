@@ -1,13 +1,10 @@
-import {Link} from "react-router-dom";
-import {FaUserCircle, FaRegComment} from "react-icons/fa";
-import {AiFillHeart} from "react-icons/ai";
-import {PostProps} from "pages/home";
+import {Post} from "types";
 import PostBox from "./PostBox";
-interface PostListProps {
-  posts: PostProps[] | undefined;
+interface PostList {
+  posts: Post[] | null;
 }
 
-const PostList = ({posts}: PostListProps) => {
+const PostList = ({posts}: PostList) => {
   return (
     <div className='post'>
       {posts?.map(post => (

@@ -4,14 +4,12 @@ import {
 } from "react-icons/bs";
 import {BsChat as ChatIcon} from "react-icons/bs";
 import {BsThreeDots as ThreeDotsIcon} from "react-icons/bs";
-import {MdOutlineInput as RepostIcon} from "react-icons/md";
 import {FiDelete as DeleteIcon} from "react-icons/fi";
 import {MdOutlineModeEditOutline as EditIcon} from "react-icons/md";
 import {BsSend as SendIcon} from "react-icons/bs";
 import AuthContext from "context/AuthContext";
 import {useContext, useState, useEffect} from "react";
-import {PostProps} from "pages/home";
-import {getUserByUid, getUserIdByUid} from "utils/UserUtils";
+import {getUserDataByUid, getUserIdByUid} from "utils/UserUtils";
 import "./Post.module.scss";
 import {useNavigate} from "react-router-dom";
 import {
@@ -24,8 +22,9 @@ import {
 import {db} from "firebaseApp";
 import {toast} from "react-toastify";
 import {getTimeElapsed} from "utils/TimeUtils";
+import {Post} from "types";
 
-const PostBox = ({post}: {post: PostProps}) => {
+const PostBox = ({post}: {post: Post}) => {
   const navigate = useNavigate();
   const {user} = useContext(AuthContext);
   const [userId, setUserId] = useState<string>("");
@@ -34,7 +33,7 @@ const PostBox = ({post}: {post: PostProps}) => {
     getUserIdByUid(post.uid, (userId: string) => {
       setUserId(userId);
     });
-    getUserByUid(post.uid, uData => {
+    getUserDataByUid(post.uid, uData => {
       setUserImageUrl(uData.imageUrl);
     });
   }, []);

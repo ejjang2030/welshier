@@ -1,13 +1,7 @@
 import React, {useState, useEffect, ChangeEvent} from "react";
 import {useNavigate} from "react-router-dom";
-import { GiSittingDog } from "react-icons/gi";
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  AuthError,
-  updateProfile,
-  signOut,
-} from "firebase/auth";
+import {GiSittingDog} from "react-icons/gi";
+import {getAuth, createUserWithEmailAndPassword, signOut} from "firebase/auth";
 import {app} from "firebaseApp";
 import SignupForm from "components/users/SignupForm";
 import {toast} from "react-toastify";
