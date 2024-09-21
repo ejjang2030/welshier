@@ -52,7 +52,10 @@ const HomePage = () => {
       </div>
       <PostInput user={user} />
       {posts?.length ? (
-        <PostList posts={posts} />
+        <PostList
+          name='home'
+          posts={posts}
+        />
       ) : (
         <div className='home__no-contents'>게시글이 없습니다.</div>
       )}

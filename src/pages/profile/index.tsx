@@ -147,16 +147,20 @@ const ProfilePage = () => {
         orderBy("createdAt", "desc")
       );
       onSnapshot(commentPostQuery, snapshot => {
-        let parentPostIds = snapshot.docs.map(doc => doc?.data().parentPostId);
-        const parentPostQuery = query(
-          postsRef,
-          where(documentId(), "in", parentPostIds),
-          orderBy("createdAt", "desc")
-        );
-        getDocs(parentPostQuery).then(value => {
-          let dataObj = value.docs.map(doc => ({...doc.data(), id: doc?.id}));
-          setCommentPosts(dataObj as Post[]);
-        });
+        let parentPostIds = [
+          ...snapshot.docs.map(doc => doc?.data().parentPostId),
+        ];
+        if (parentPostIds && parentPostIds.length > 0) {
+          const parentPostQuery = query(
+            postsRef,
+            where(documentId(), "in", parentPostIds),
+            orderBy("createdAt", "desc")
+          );
+          getDocs(parentPostQuery).then(value => {
+            let dataObj = value.docs.map(doc => ({...doc.data(), id: doc?.id}));
+            setCommentPosts(dataObj as Post[]);
+          });
+        }
       });
 
       // 현재 프로필의 사용자가 좋아요를 표시한 게시글 목록 조회
@@ -210,6 +214,7 @@ const ProfilePage = () => {
             <div className='images'>
               {followersImageUrls.map((imageUrl, index) => (
                 <img
+                  key={`img${index + 1}`}
                   className={`img${index + 1}`}
                   src={imageUrl}
                   alt=''
@@ -272,30 +277,45 @@ const ProfilePage = () => {
         </div>
       </div>
       <div className='profile__body'>
-        {currTab === "threads" && (
+        {!isItMe && userData?.isPrivate && !isFollow ? (
+          <div className='no-contents'>비공개 프로필입니다.</div>
+        ) : (
           <>
-            {myPosts?.length ? (
-              <PostList posts={myPosts} />
-            ) : (
-              <div className='no-contents'>게시글이 없습니다.</div>
+            {currTab === "threads" && (
+              <>
+                {myPosts?.length ? (
+                  <PostList
+                    name='myPosts'
+                    posts={myPosts}
+                  />
+                ) : (
+                  <div className='no-contents'>게시글이 없습니다.</div>
+                )}
+              </>
             )}
-          </>
-        )}
-        {currTab === "comments" && (
-          <>
-            {commentPosts?.length ? (
-              <PostList posts={commentPosts} />
-            ) : (
-              <div className='no-contents'>게시글이 없습니다.</div>
+            {currTab === "comments" && (
+              <>
+                {commentPosts?.length ? (
+                  <PostList
+                    name='comments'
+                    posts={commentPosts}
+                  />
+                ) : (
+                  <div className='no-contents'>게시글이 없습니다.</div>
+                )}
+              </>
             )}
-          </>
-        )}
-        {currTab === "reposts" && (
-          <>
-            {likePosts?.length ? (
-              <PostList posts={likePosts} />
-            ) : (
-              <div className='no-contents'>게시글이 없습니다.</div>
+            {currTab === "reposts" && (
+              <>
+                {likePosts?.length ? (
+                  <PostList
+                    name='likes'
+                    posts={likePosts}
+                  />
+                ) : (
+                  <div className='no-contents'>게시글이 없습니다.</div>
+                )}
+              </>
             )}
           </>
         )}

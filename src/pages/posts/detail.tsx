@@ -40,20 +40,22 @@ const PostDetailPage = () => {
 
   useEffect(() => {
     setCommentPosts([]);
-    if (post && post.comments) {
-      const postsRef = collection(db, "posts");
-      const postsQuery = query(
-        postsRef,
-        where(documentId(), "in", post.comments),
-        orderBy("createdAt", "asc")
-      );
-      onSnapshot(postsQuery, snapshot => {
-        let dataObj = snapshot.docs.map(doc => ({
-          ...doc.data(),
-          id: doc?.id,
-        }));
-        setCommentPosts(dataObj as Post[]);
-      });
+    if (post) {
+      if (post.comments && post.comments.length > 0) {
+        const postsRef = collection(db, "posts");
+        const postsQuery = query(
+          postsRef,
+          where(documentId(), "in", post.comments),
+          orderBy("createdAt", "asc")
+        );
+        onSnapshot(postsQuery, snapshot => {
+          let dataObj = snapshot.docs.map(doc => ({
+            ...doc.data(),
+            id: doc?.id,
+          }));
+          setCommentPosts(dataObj as Post[]);
+        });
+      }
     }
   }, [post]);
 
@@ -73,7 +75,12 @@ const PostDetailPage = () => {
           <>
             <PostBox post={post} />
             <div className='horizontal-divider'> </div>
-            {commentPosts && <PostList posts={commentPosts} />}
+            {commentPosts && (
+              <PostList
+                name='detail'
+                posts={commentPosts}
+              />
+            )}
             <PostInput
               isEdit
               user={user}

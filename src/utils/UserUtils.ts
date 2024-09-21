@@ -79,8 +79,13 @@ export const getTwoUserImageUrlsFromFollowers = async (
   const randomFollowers = getRandomElements<Follower>(followers, 2);
   if (randomFollowers && randomFollowers.length > 0) {
     const followersIds = randomFollowers.map(follower => follower.id);
-    const q = query(collection(db, "users"), where("uid", "in", followersIds));
-    const snapshot = await getDocs(q);
-    cb(snapshot.docs.map(doc => doc.data().imageUrl));
+    if (followersIds) {
+      const q = query(
+        collection(db, "users"),
+        where("uid", "in", followersIds)
+      );
+      const snapshot = await getDocs(q);
+      cb(snapshot.docs.map(doc => doc.data().imageUrl));
+    }
   }
 };
