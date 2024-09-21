@@ -6,6 +6,7 @@ export interface UserData {
   imageUrl: string;
   introduction: string;
   isPrivate: boolean;
+  userIdUpdatedAt?: Date | string;
 }
 
 export interface Follower {

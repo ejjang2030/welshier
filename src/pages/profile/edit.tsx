@@ -12,6 +12,11 @@ import {v4 as uuidv4} from "uuid";
 import {getDownloadURL, ref, uploadString} from "firebase/storage";
 
 import "./Profile.module.scss";
+import {
+  getAfterTime,
+  getTimeElapsed,
+  isWithinTimePeriod,
+} from "utils/TimeUtils";
 
 const ProfileEditPage = () => {
   const {user} = useContext(AuthContext);
@@ -40,7 +45,10 @@ const ProfileEditPage = () => {
       return;
     }
     const isDuplicatedUserId = await checkDuplicatedUserId(userId);
-    if (isDuplicatedUserId) {
+    if (
+      !isWithinTimePeriod(user?.userIdUpdatedAt, 10, "days") &&
+      isDuplicatedUserId
+    ) {
       setErrorMsg("중복된 아이디가 존재합니다.");
       return;
     }
@@ -64,10 +72,17 @@ const ProfileEditPage = () => {
         uid: user?.uid,
         email: user?.email,
         name: name,
-        userId: userId,
+        ...(!isWithinTimePeriod(user?.userIdUpdatedAt, 10, "days")
+          ? {userId: userId}
+          : {}),
         introduction: intro,
         isPrivate: isPrivate,
         imageUrl: imageUrl,
+        userIdUpdatedAt: new Date()?.toLocaleDateString("en", {
+          hour: "numeric",
+          minute: "numeric",
+          second: "numeric",
+        }),
       };
       await setDoc(userRef, modifiedUserData, {
         ...(userSnapshot.exists() ? {merge: true} : {}),
@@ -173,7 +188,17 @@ const ProfileEditPage = () => {
                 placeholder='아이디를 입력해주세요.'
                 value={userId}
                 onChange={e => setUserId(e.target.value)}
+                disabled={isWithinTimePeriod(user?.userIdUpdatedAt, 10, "days")}
               />
+              {isWithinTimePeriod(user?.userIdUpdatedAt, 10, "days") && (
+                <span className='info'>
+                  ※{" "}
+                  {getTimeElapsed(
+                    getAfterTime(user?.userIdUpdatedAt, 10, "days").toDate()
+                  )}
+                  에 아이디를 수정하실 수 있습니다.
+                </span>
+              )}
             </div>
           </div>
           <div className='profile-edit__body-box-introduce'>

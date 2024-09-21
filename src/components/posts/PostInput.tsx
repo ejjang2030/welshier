@@ -1,27 +1,35 @@
-import {useRef, useState, useEffect, useCallback} from "react";
-import {Link, useNavigate, useParams} from "react-router-dom";
-import {RiHashtag} from "react-icons/ri";
-import {FiMic} from "react-icons/fi";
-import {MdOutlineGifBox} from "react-icons/md";
-import {CgMenuLeft} from "react-icons/cg";
-import {LuImage} from "react-icons/lu";
-import {MdOutlinePhotoCamera} from "react-icons/md";
-import {useContext} from "react";
-import AuthContext from "context/AuthContext";
-import {getUserDataByUid} from "utils/UserUtils";
-import {addDoc, collection, doc, getDoc, updateDoc} from "firebase/firestore";
+import {useRef, useState, useEffect} from "react";
+import {Link, useNavigate} from "react-router-dom";
+import {
+  addDoc,
+  arrayUnion,
+  collection,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import {db} from "firebaseApp";
 import {toast} from "react-toastify";
-import {Post} from "types";
+import {Post, UserData} from "types";
 
-const PostInput = ({isEdit = false}: {isEdit?: boolean}) => {
-  const {id: postId} = useParams();
-  const [post, setPost] = useState<Post | null>(null);
+interface PostInputProps {
+  user: UserData | null;
+  isEdit?: boolean;
+  defaultPost?: Post | null;
+  parentPostId?: string | null;
+}
+
+const PostInput = ({
+  user,
+  defaultPost = null,
+  isEdit = false,
+  parentPostId = null,
+}: PostInputProps) => {
   const navigate = useNavigate();
-  const {user} = useContext(AuthContext);
-  const [content, setContent] = useState<string>("");
-  const [userData, setUserData] = useState<any>();
+
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const [post, setPost] = useState<Post | null>(null);
+  const [content, setContent] = useState<string>("");
   const [hashtag, setHashtag] = useState<string>("");
   const [hashtags, setHashtags] = useState<string[]>([]);
 
@@ -56,12 +64,16 @@ const PostInput = ({isEdit = false}: {isEdit?: boolean}) => {
     setHashtags(hashtags.filter(hashtag => hashtag !== tag));
   };
 
+  useEffect(() => {
+    autoResize();
+  }, [content]);
+
   const handleClickSubmit = async (e: any) => {
     e.preventDefault();
     try {
-      if (postId) {
+      if (post) {
         if (user!.uid === post?.uid) {
-          const postRef = doc(db, "posts", postId);
+          const postRef = doc(db, "posts", post.id);
           await updateDoc(postRef, {
             content: content,
             hashtags: hashtags,
@@ -71,7 +83,7 @@ const PostInput = ({isEdit = false}: {isEdit?: boolean}) => {
           toast.success("게시글 작성자가 아닙니다.");
         }
       } else {
-        await addDoc(collection(db, "posts"), {
+        const result = await addDoc(collection(db, "posts"), {
           content: content,
           createdAt: new Date()?.toLocaleDateString("en", {
             hour: "numeric",
@@ -79,10 +91,17 @@ const PostInput = ({isEdit = false}: {isEdit?: boolean}) => {
             second: "numeric",
           }),
           uid: user?.uid,
-          userId: userData?.userId,
+          userId: user?.userId,
           email: user?.email,
           hashtags: hashtags,
+          parentPostId: parentPostId ?? "root",
         });
+        if (parentPostId) {
+          const postRef = doc(db, "posts", parentPostId);
+          await updateDoc(postRef, {
+            comments: arrayUnion(result.id),
+          });
+        }
         toast.success("글을 게시했습니다.");
       }
     } catch (error) {
@@ -95,33 +114,16 @@ const PostInput = ({isEdit = false}: {isEdit?: boolean}) => {
     }
   };
 
-  const getPost = useCallback(async () => {
-    if (postId) {
-      const postRef = doc(db, "posts", postId);
-      const postSnapshot = await getDoc(postRef);
-      setPost({...(postSnapshot.data() as Post), id: postSnapshot.id});
-      setContent(postSnapshot?.data()?.content);
-      setHashtags(postSnapshot?.data()?.hashtags || []);
-    }
-  }, [postId]);
+  useEffect(() => {
+    setPost(defaultPost);
+  }, [defaultPost]);
 
   useEffect(() => {
-    autoResize();
-  }, [content]);
-
-  useEffect(() => {
-    if (user) {
-      getUserDataByUid(user.uid, uData => {
-        setUserData(uData);
-      });
+    if (post) {
+      setContent(post.content);
+      setHashtags(post.hashtags || []);
     }
-  }, []);
-
-  useEffect(() => {
-    if (postId) {
-      getPost();
-    }
-  }, [getPost, postId]);
+  }, [post]);
 
   return (
     <div className='post-input'>
@@ -130,13 +132,13 @@ const PostInput = ({isEdit = false}: {isEdit?: boolean}) => {
           <div className='post-input__box-profile'>
             <img
               className='post-input__box-profile-image'
-              src={userData?.imageUrl || ""}
+              src={user?.imageUrl || ""}
               alt=''
             />
           </div>
           <div className='post-input__box-body'>
             <div className='post-input__box-body-username'>
-              {userData?.userId || ""}
+              {user?.userId || ""}
             </div>
             <div className='post-input__box-body-content'>
               {isEdit ? (
@@ -161,35 +163,39 @@ const PostInput = ({isEdit = false}: {isEdit?: boolean}) => {
                         <span
                           key={index}
                           className='item'
-                          onClick={() => removeHashtag(tag)}>
+                          onClick={() => {
+                            removeHashtag(tag);
+                          }}>
                           #{tag}
                         </span>
                       ))}
                     </div>
-                    <input
-                      className='hashtag-input'
-                      name='hashtag'
-                      id='hashtag'
-                      placeholder='해시태그를 입력해주세요.'
-                      onChange={onChangeHashtag}
-                      onKeyUp={handleKeyUp}
-                      value={hashtag}
-                    />
+                    {isEdit && (
+                      <input
+                        className='hashtag-input'
+                        name='hashtag'
+                        id='hashtag'
+                        placeholder='해시태그를 입력해주세요.'
+                        onChange={onChangeHashtag}
+                        onKeyUp={handleKeyUp}
+                        value={hashtag}
+                      />
+                    )}
                   </div>
                 </>
               ) : (
                 "새로운 소식이 있나요?"
               )}
             </div>
-            <div className='post-input__box-body-buttons'>
+            {/* <div className='post-input__box-body-buttons'>
               <LuImage className='icon' />
               <MdOutlinePhotoCamera className='icon' />
               <MdOutlineGifBox className='icon' />
               <FiMic className='icon' />
               <RiHashtag className='icon' />
               <CgMenuLeft className='icon' />
-            </div>
-            <div>
+            </div> */}
+            <div className='post-input__box-body-btn'>
               {isEdit && <button onClick={handleClickSubmit}>게시</button>}
             </div>
           </div>

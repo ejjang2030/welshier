@@ -4,7 +4,7 @@ import {
 } from "react-icons/bs";
 import {BsChat as ChatIcon} from "react-icons/bs";
 import {BsThreeDots as ThreeDotsIcon} from "react-icons/bs";
-import {FiDelete as DeleteIcon} from "react-icons/fi";
+import {CgRemove as DeleteIcon} from "react-icons/cg";
 import {MdOutlineModeEditOutline as EditIcon} from "react-icons/md";
 import {BsSend as SendIcon} from "react-icons/bs";
 import AuthContext from "context/AuthContext";
@@ -34,7 +34,9 @@ const PostBox = ({post}: {post: Post}) => {
       setUserId(userId);
     });
     getUserDataByUid(post.uid, uData => {
-      setUserImageUrl(uData.imageUrl);
+      if (uData) {
+        setUserImageUrl(uData.imageUrl);
+      }
     });
   }, []);
 
@@ -45,6 +47,7 @@ const PostBox = ({post}: {post: Post}) => {
   };
 
   const handleToggleLike = async (e: any) => {
+    e.preventDefault();
     const likeRef = doc(db, "posts", post.id);
 
     if (user?.uid && post.likes?.includes(user!.uid)) {
@@ -72,7 +75,10 @@ const PostBox = ({post}: {post: Post}) => {
           src={userImageUrl}
           alt=''
           style={{cursor: "pointer"}}
-          onClick={() => navigate(`/profile/@${userId}`)}
+          onClick={(e: any) => {
+            e.preventDefault();
+            navigate(`/profile/@${userId}`);
+          }}
         />
       </div>
       <div className='content'>
@@ -97,7 +103,7 @@ const PostBox = ({post}: {post: Post}) => {
                 />
               </>
             )}
-            <ThreeDotsIcon className='icon' />
+            {/* <ThreeDotsIcon className='icon' /> */}
           </div>
         </div>
         <div className='body'>
@@ -124,7 +130,9 @@ const PostBox = ({post}: {post: Post}) => {
               )}
               <span>{post.likeCount || 0}</span>
             </div>
-            <div className='comments-btn'>
+            <div
+              className='comments-btn'
+              onClick={() => navigate(`/posts/${post.id}`)}>
               <ChatIcon className='icon' />
               <span>{post.comments?.length || 0}</span>
             </div>

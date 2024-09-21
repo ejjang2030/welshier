@@ -31,6 +31,7 @@ export const AuthContextProvider = ({children}: AuthContextProviderProps) => {
               imageUrl: uData.imageUrl,
               introduction: uData.introduction,
               isPrivate: uData.isPrivate,
+              userIdUpdatedAt: uData.userIdUpdatedAt,
             };
             setCurrentUser(userData);
             setIsNotSetProfile(false);

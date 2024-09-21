@@ -12,7 +12,7 @@ import {getRandomElements} from "./RandomUtils";
 
 export const getUserDataByUid = async (
   uid: string,
-  cb: (userData: UserData) => void
+  cb: (userData: UserData | null) => void
 ) => {
   const userRef = doc(db, "users", uid);
   getDoc(userRef).then(snapshot => {
@@ -26,10 +26,11 @@ export const getUserDataByUid = async (
         imageUrl: data.imageUrl,
         introduction: data.introduction,
         isPrivate: data.isPrivate,
+        userIdUpdatedAt: data.userIdUpdatedAt,
       };
       cb(uData);
     } else {
-      throw new Error("사용자 정보가 없습니다.");
+      cb(null);
     }
   });
 };
@@ -76,11 +77,9 @@ export const getTwoUserImageUrlsFromFollowers = async (
   cb: (imageUrls: string[]) => void
 ) => {
   const randomFollowers = getRandomElements<Follower>(followers, 2);
-  if (randomFollowers) {
-    const q = query(
-      collection(db, "users"),
-      where("uid", "in", [...randomFollowers!.map(follower => follower.id)])
-    );
+  if (randomFollowers && randomFollowers.length > 0) {
+    const followersIds = randomFollowers.map(follower => follower.id);
+    const q = query(collection(db, "users"), where("uid", "in", followersIds));
     const snapshot = await getDocs(q);
     cb(snapshot.docs.map(doc => doc.data().imageUrl));
   }

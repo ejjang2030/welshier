@@ -10,10 +10,13 @@ import {
 } from "utils/UserUtils";
 
 import {
+  and,
   arrayRemove,
   arrayUnion,
   collection,
   doc,
+  documentId,
+  getDocs,
   onSnapshot,
   orderBy,
   query,
@@ -30,8 +33,10 @@ const ProfilePage = () => {
   const location = useLocation();
   const [userData, setUserData] = useState<UserData | undefined>();
   const [myPosts, setMyPosts] = useState<Post[]>([]);
+  const [commentPosts, setCommentPosts] = useState<Post[]>([]);
   const [likePosts, setLikePosts] = useState<Post[]>([]);
   const [followers, setFollowers] = useState<Follower[]>([]);
+  const [followersImageUrls, setFollowersImageUrls] = useState<string[]>([]);
   const [isItMe, setIsItMe] = useState<boolean>(false);
   const navigate = useNavigate();
   const [currTab, setCurrTab] = useState<"threads" | "comments" | "reposts">(
@@ -113,11 +118,15 @@ const ProfilePage = () => {
         });
       });
 
-      // 현재 프로필의 사용자가 게시한 글 목록 조회
       const postsRef = collection(db, "posts");
+
+      // 현재 프로필의 사용자가 게시한 글 목록 조회
       const myPostQuery = query(
         postsRef,
-        where("uid", "==", userData.uid),
+        and(
+          where("uid", "==", userData.uid),
+          where("parentPostId", "==", "root")
+        ),
         orderBy("createdAt", "desc")
       );
       onSnapshot(myPostQuery, snapshot => {
@@ -126,6 +135,28 @@ const ProfilePage = () => {
           id: doc?.id,
         }));
         setMyPosts(dataObj as Post[]);
+      });
+
+      // 현재 프로필의 사용자가 게시글의 댓글을 단 목록 조회
+      const commentPostQuery = query(
+        postsRef,
+        and(
+          where("uid", "==", userData.uid),
+          where("parentPostId", "!=", "root")
+        ),
+        orderBy("createdAt", "desc")
+      );
+      onSnapshot(commentPostQuery, snapshot => {
+        let parentPostIds = snapshot.docs.map(doc => doc?.data().parentPostId);
+        const parentPostQuery = query(
+          postsRef,
+          where(documentId(), "in", parentPostIds),
+          orderBy("createdAt", "desc")
+        );
+        getDocs(parentPostQuery).then(value => {
+          let dataObj = value.docs.map(doc => ({...doc.data(), id: doc?.id}));
+          setCommentPosts(dataObj as Post[]);
+        });
       });
 
       // 현재 프로필의 사용자가 좋아요를 표시한 게시글 목록 조회
@@ -146,7 +177,9 @@ const ProfilePage = () => {
 
   useEffect(() => {
     if (followers) {
-      getTwoUserImageUrlsFromFollowers(followers, () => {});
+      getTwoUserImageUrlsFromFollowers(followers, (imageUrls: string[]) => {
+        setFollowersImageUrls(imageUrls);
+      });
     }
   }, [followers]);
 
@@ -173,11 +206,27 @@ const ProfilePage = () => {
         </div>
         <div className='profile__my-profile-role'>{userData?.introduction}</div>
         <div className='profile__my-profile-followers'>
-          <div className='images'>
-            <div className='img1'></div>
-            <div className='img2'></div>
+          {followers.length > 0 && followersImageUrls.length !== 0 && (
+            <div className='images'>
+              {followersImageUrls.map((imageUrl, index) => (
+                <img
+                  className={`img${index + 1}`}
+                  src={imageUrl}
+                  alt=''
+                />
+              ))}
+            </div>
+          )}
+          <div
+            className={
+              followersImageUrls.length > 1
+                ? "followers"
+                : followersImageUrls.length === 1
+                ? "follower"
+                : "no-follower"
+            }>
+            팔로워 {followers.length || 0}명
           </div>
-          <div className='followers'>팔로워 {followers.length || 0}명</div>
         </div>
         <div className='profile__my-profile-buttons'>
           {isItMe ? (
@@ -228,7 +277,16 @@ const ProfilePage = () => {
             {myPosts?.length ? (
               <PostList posts={myPosts} />
             ) : (
-              <>게시글이 없습니다.</>
+              <div className='no-contents'>게시글이 없습니다.</div>
+            )}
+          </>
+        )}
+        {currTab === "comments" && (
+          <>
+            {commentPosts?.length ? (
+              <PostList posts={commentPosts} />
+            ) : (
+              <div className='no-contents'>게시글이 없습니다.</div>
             )}
           </>
         )}
@@ -237,7 +295,7 @@ const ProfilePage = () => {
             {likePosts?.length ? (
               <PostList posts={likePosts} />
             ) : (
-              <>게시글이 없습니다.</>
+              <div className='no-contents'>게시글이 없습니다.</div>
             )}
           </>
         )}

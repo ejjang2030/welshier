@@ -1,6 +1,6 @@
 import React, {useState, ChangeEvent} from "react";
 import LoginForm from "components/users/LoginForm";
-import { GiSittingDog } from "react-icons/gi";
+import {GiSittingDog} from "react-icons/gi";
 import {RiKakaoTalkFill} from "react-icons/ri";
 import {SiNaver} from "react-icons/si";
 import {

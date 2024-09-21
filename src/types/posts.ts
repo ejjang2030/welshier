@@ -10,4 +10,5 @@ export interface Post {
   likeCount?: number;
   comments?: any;
   hashtags?: string[];
+  parentPostId?: string;
 }
