@@ -887,3 +887,167 @@ body {
     height: 100vh;
   }
 }
+
+.search {
+  height: 100vh;
+  &__appbar {
+    padding: 16px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    &-text {
+      font-family: $font;
+      font-size: 24px;
+      font-weight: 700;
+    }
+    &-input {
+      padding: 12px;
+      box-sizing: border-box;
+      background-color: #ddd;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+      justify-content: left;
+      align-items: center;
+      .icon {
+        color: #656565;
+        stroke-width: 1px;
+      }
+      input {
+        border: none;
+        background-color: transparent;
+        width: 100%;
+        &::placeholder {
+          font-weight: 600;
+          font-size: 14px;
+          color: #656565;
+        }
+        &:hover,
+        &:focus {
+          outline: none;
+        }
+      }
+    }
+  }
+  &__tabs {
+    padding: 4px 16px 16px;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    background-color: white;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    &-tab {
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box;
+      border-radius: 8px;
+      text-align: center;
+      color: #959595;
+      font-size: 16px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border: 0.5px solid #ddd;
+    }
+    &-tab.active {
+      color: white;
+      background-color: black;
+      border-bottom: 1.5px solid black;
+    }
+  }
+}
+
+.searched-user-item {
+  display: flex;
+  flex-direction: row;
+  padding: 8px 16px;
+  gap: 12px;
+  justify-content: space-between;
+  border-bottom: 0.5px solid #ddd;
+
+  &__image {
+    img {
+      width: 40px;
+      height: 40px;
+      background-color: white;
+      border-radius: 999px;
+      border: 0.5px solid #ddd;
+    }
+  }
+  &__profile {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    gap: 4px;
+    &-introduction {
+      max-width: 200px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    &-followers {
+      @extend .flex-row;
+      gap: 4px;
+      // padding: 0 16px;
+      justify-content: left;
+      align-items: center;
+      vertical-align: middle;
+      text-align: center;
+      .images {
+        @extend .flex-row;
+        box-sizing: border-box;
+        .img1,
+        .img2 {
+          width: 20px;
+          height: 20px;
+          background-color: rgb(242, 242, 242);
+          border-radius: 999px;
+          border: 2px solid white;
+        }
+        .img2 {
+          transform: translateX(-10px);
+          background-color: #60a5fa;
+        }
+      }
+      .no-follower {
+        font-size: 16px;
+        color: #847f7f;
+      }
+      .follower {
+        font-size: 16px;
+        color: #847f7f;
+      }
+      .followers {
+        font-size: 16px;
+        transform: translateX(-10px);
+        color: #847f7f;
+      }
+    }
+  }
+  &__follow-btn {
+    button {
+      border: 1px solid #ddd;
+      background-color: white;
+      border-radius: 5px;
+      padding: 6px 12px;
+      width: 80px;
+      font-family: $font;
+      font-weight: 600;
+      &.follow-btn {
+        background-color: black;
+        color: white;
+        &:hover,
+        &:focus {
+          background-color: rgb(47, 47, 47);
+        }
+      }
+      &.followed-btn {
+        background-color: white;
+        color: #ddd;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+      }
+    }
+  }
+}

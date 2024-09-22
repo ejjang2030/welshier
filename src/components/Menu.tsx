@@ -1,5 +1,5 @@
-import {MouseEvent} from "react";
-import {useNavigate} from "react-router-dom";
+import {MouseEvent, useEffect} from "react";
+import {useLocation, useNavigate} from "react-router-dom";
 import {FaPlus} from "react-icons/fa";
 import {FaRegHeart} from "react-icons/fa";
 
@@ -23,9 +23,22 @@ import {getUserIdByUid} from "utils/UserUtils";
 type Tabs = "home" | "search" | "add-post" | "notifications" | "profile";
 
 const MenuList = () => {
+  const location = useLocation();
   const {user} = useContext(AuthContext);
   const navigate = useNavigate();
   const [currTab, setCurrTab] = useState<Tabs>("home");
+
+  useEffect(() => {
+    console.log(location);
+    if (location) {
+      const pathname = location.pathname;
+      if (pathname === "/") setCurrTab("home");
+      if (pathname.includes("/search")) setCurrTab("search");
+      if (pathname.includes("/posts")) setCurrTab("add-post");
+      if (pathname.includes("/notifications")) setCurrTab("notifications");
+      if (pathname.includes("/profile")) setCurrTab("profile");
+    }
+  }, [location]);
 
   const handleClick = async (e: MouseEvent<HTMLButtonElement>, name: Tabs) => {
     setCurrTab(name);
