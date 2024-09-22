@@ -29,7 +29,6 @@ const MenuList = () => {
   const [currTab, setCurrTab] = useState<Tabs>("home");
 
   useEffect(() => {
-    console.log(location);
     if (location) {
       const pathname = location.pathname;
       if (pathname === "/") setCurrTab("home");
