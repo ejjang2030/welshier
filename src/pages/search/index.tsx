@@ -2,16 +2,25 @@ import {ChangeEvent, useCallback, useEffect, useState} from "react";
 import {GoSearch as SearchIcon} from "react-icons/go";
 
 import "./Search.module.scss";
-import {UserData} from "types";
-import {collection, onSnapshot, or, query, where} from "firebase/firestore";
+import {Post, UserData} from "types";
+import {
+  collection,
+  onSnapshot,
+  or,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
 import {db} from "firebaseApp";
 import SearchedUserItem from "components/users/SearchedUserItem";
+import PostBox from "components/posts/PostBox";
 
 type SearchTab = "users" | "hashtags";
 
 const SearchPage = () => {
   const [searchText, setSearchText] = useState<string>("");
   const [searchedUsers, setSearchedUsers] = useState<UserData[]>([]);
+  const [searchedPosts, setSearchedPosts] = useState<Post[]>([]);
   const [currTab, setCurrTab] = useState<SearchTab>("users");
 
   const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -31,8 +40,11 @@ const SearchPage = () => {
 
   useEffect(() => {
     setSearchedUsers([]);
+    setSearchedPosts([]);
     if (searchText) {
       const searchedUsersRef = collection(db, "users");
+
+      // 사용자 검색 결과 목록 조회
       onSnapshot(searchedUsersRef, snapshot => {
         snapshot.docs.forEach(doc => {
           let data = doc.data() as UserData;
@@ -46,6 +58,21 @@ const SearchPage = () => {
               prev ? [...Array.from(new Set([...prev, data]))] : []
             );
           }
+        });
+      });
+
+      // 해시태그로 검색된 게시글 목록 조회
+      const searchedPostsRef = collection(db, "posts");
+      const searchedPostsByHashtagsQuery = query(
+        searchedPostsRef,
+        where("hashtags", "array-contains-any", [searchText]),
+        orderBy("createdAt", "desc")
+      );
+      onSnapshot(searchedPostsByHashtagsQuery, snapshot => {
+        snapshot.docs.map(doc => {
+          setSearchedPosts(prev =>
+            prev ? [...prev, {...(doc.data() as Post), id: doc.id}] : []
+          );
         });
       });
     }
@@ -89,6 +116,15 @@ const SearchPage = () => {
             <SearchedUserItem
               key={`${index}`}
               userData={userData}
+            />
+          ))}
+        {currTab === "hashtags" &&
+          searchedPosts &&
+          searchedPosts.length > 0 &&
+          searchedPosts.map((post, index) => (
+            <PostBox
+              key={`${index}`}
+              post={post}
             />
           ))}
       </div>

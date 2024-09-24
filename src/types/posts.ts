@@ -11,4 +11,5 @@ export interface Post {
   comments?: any;
   hashtags?: string[];
   parentPostId?: string;
+  viewCount?: number;
 }

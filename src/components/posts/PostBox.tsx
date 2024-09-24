@@ -3,7 +3,6 @@ import {
   BsHeartFill as HeartIconFill,
 } from "react-icons/bs";
 import {BsChat as ChatIcon} from "react-icons/bs";
-import {BsThreeDots as ThreeDotsIcon} from "react-icons/bs";
 import {CgRemove as DeleteIcon} from "react-icons/cg";
 import {MdOutlineModeEditOutline as EditIcon} from "react-icons/md";
 import {BsSend as SendIcon} from "react-icons/bs";
@@ -18,11 +17,15 @@ import {
   deleteDoc,
   updateDoc,
   doc,
+  setDoc,
+  collection,
+  addDoc,
 } from "firebase/firestore";
 import {db} from "firebaseApp";
 import {toast} from "react-toastify";
 import {getTimeElapsed} from "utils/TimeUtils";
 import {Post} from "types";
+import {ActivityData} from "types/notifications";
 
 const PostBox = ({post}: {post: Post}) => {
   const navigate = useNavigate();
@@ -63,6 +66,20 @@ const PostBox = ({post}: {post: Post}) => {
           likes: arrayUnion(user.uid),
           likeCount: post?.likeCount ? post?.likeCount + 1 : 1,
         });
+        const activityRef = doc(db, "activities", post.uid);
+        const collectionRef = collection(activityRef, "activities");
+        const activityData: ActivityData = {
+          activityType: "liked",
+          uid: user.uid,
+          postId: post.id,
+          isRead: false,
+          createdAt: new Date().toLocaleDateString("en", {
+            hour: "numeric",
+            minute: "numeric",
+            second: "numeric",
+          }),
+        };
+        await addDoc(collectionRef, activityData);
       }
     }
   };

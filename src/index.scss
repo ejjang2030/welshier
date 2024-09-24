@@ -888,6 +888,51 @@ body {
   }
 }
 
+.activities {
+  height: 100vh;
+  &__appbar {
+    padding: 16px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    &-text {
+      font-family: $font;
+      font-size: 24px;
+      font-weight: 700;
+    }
+    &-input {
+      padding: 12px;
+      box-sizing: border-box;
+      background-color: #ddd;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+      justify-content: left;
+      align-items: center;
+      .icon {
+        color: #656565;
+        stroke-width: 1px;
+      }
+      input {
+        border: none;
+        background-color: transparent;
+        width: 100%;
+        &::placeholder {
+          font-weight: 600;
+          font-size: 14px;
+          color: #656565;
+        }
+        &:hover,
+        &:focus {
+          outline: none;
+        }
+      }
+    }
+  }
+}
+
 .search {
   height: 100vh;
   &__appbar {
@@ -958,7 +1003,8 @@ body {
   }
 }
 
-.searched-user-item {
+.searched-user-item,
+.followed-notification-item {
   display: flex;
   flex-direction: row;
   padding: 8px 16px;
@@ -973,6 +1019,10 @@ body {
       background-color: white;
       border-radius: 999px;
       border: 0.5px solid #ddd;
+    }
+    .person {
+      width: 5px;
+      height: 5px;
     }
   }
   &__profile {

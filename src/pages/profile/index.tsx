@@ -10,6 +10,7 @@ import {
 } from "utils/UserUtils";
 
 import {
+  addDoc,
   and,
   arrayRemove,
   arrayUnion,
@@ -27,6 +28,7 @@ import {
 import {db} from "firebaseApp";
 import PostList from "components/posts/PostList";
 import {Follower, Post, UserData} from "types";
+import {ActivityData} from "types/notifications";
 
 const ProfilePage = () => {
   const {user} = useContext(AuthContext);
@@ -86,6 +88,21 @@ const ProfilePage = () => {
           {users: arrayUnion({id: user.uid})},
           {merge: true}
         );
+
+        // 해당 프로필의 사용자에게 팔로우 한 사실을 알림으로 전송
+        const activityRef = doc(db, "activities", userData.uid);
+        const collectionRef = collection(activityRef, "activities");
+        const activityData: ActivityData = {
+          activityType: "followed",
+          uid: user.uid,
+          isRead: false,
+          createdAt: new Date().toLocaleDateString("en", {
+            hour: "numeric",
+            minute: "numeric",
+            second: "numeric",
+          }),
+        };
+        await addDoc(collectionRef, activityData);
       }
     },
     [userData, user]

@@ -1,4 +1,4 @@
-import {MouseEvent, useEffect} from "react";
+import {MouseEvent, useCallback, useEffect} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import {FaPlus} from "react-icons/fa";
 import {FaRegHeart} from "react-icons/fa";
@@ -19,6 +19,8 @@ import {GoPerson as ProfileIconOutline} from "react-icons/go";
 import {useContext, useState} from "react";
 import AuthContext from "context/AuthContext";
 import {getUserIdByUid} from "utils/UserUtils";
+import {collection, doc, onSnapshot, query, where} from "firebase/firestore";
+import {db} from "firebaseApp";
 
 type Tabs = "home" | "search" | "add-post" | "notifications" | "profile";
 
@@ -27,6 +29,7 @@ const MenuList = () => {
   const {user} = useContext(AuthContext);
   const navigate = useNavigate();
   const [currTab, setCurrTab] = useState<Tabs>("home");
+  const [existActivity, setExistActivity] = useState<boolean>(false);
 
   useEffect(() => {
     if (location) {
@@ -38,6 +41,30 @@ const MenuList = () => {
       if (pathname.includes("/profile")) setCurrTab("profile");
     }
   }, [location]);
+
+  const getExistActivity = useCallback(async () => {
+    if (user) {
+      const postRef = doc(db, "activities", user!.uid);
+      const collectionRef = collection(postRef, "activities");
+      const existUnreadActivities = query(
+        collectionRef,
+        where("isRead", "==", false)
+      );
+      onSnapshot(existUnreadActivities, snapshot => {
+        if (snapshot.docs && snapshot.docs.length > 0) {
+          setExistActivity(true);
+        } else {
+          setExistActivity(false);
+        }
+      });
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      getExistActivity();
+    }
+  }, [currTab, user]);
 
   const handleClick = async (e: MouseEvent<HTMLButtonElement>, name: Tabs) => {
     setCurrTab(name);
@@ -99,11 +126,26 @@ const MenuList = () => {
           type='button'
           className='button'
           id='notifications'
-          onClick={e => handleClick(e, "notifications")}>
+          onClick={e => handleClick(e, "notifications")}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+          }}>
           {currTab === "notifications" ? (
             <HeartIconFill className='icon' />
           ) : (
             <HeartIconOutline className='icon' />
+          )}
+          {existActivity && (
+            <div
+              style={{
+                backgroundColor: "red",
+                width: "5px",
+                height: "5px",
+                borderRadius: "999px",
+                color: "red",
+              }}></div>
           )}
         </button>
         <button

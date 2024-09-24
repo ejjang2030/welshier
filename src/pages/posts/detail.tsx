@@ -3,6 +3,7 @@ import PostInput from "components/posts/PostInput";
 import PostList from "components/posts/PostList";
 import AuthContext from "context/AuthContext";
 import {
+  addDoc,
   collection,
   doc,
   documentId,
@@ -10,6 +11,7 @@ import {
   onSnapshot,
   orderBy,
   query,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import {db} from "firebaseApp";
@@ -17,6 +19,7 @@ import {useCallback, useContext, useEffect, useState} from "react";
 import {AiOutlineArrowLeft as GoBackIcon} from "react-icons/ai";
 import {useNavigate, useParams} from "react-router-dom";
 import {Post} from "types";
+import {ActivityData} from "types/notifications";
 
 const PostDetailPage = () => {
   const {user} = useContext(AuthContext);
@@ -34,13 +37,45 @@ const PostDetailPage = () => {
     }
   }, [postId]);
 
+  // 조회수 업데이트
+  const updateViewCount = useCallback(async () => {
+    if (post) {
+      // 해당 게시물의 조회수가 100회 단위로 일어났을 경우 조회수 알람을 보내는 로직
+      if (post.viewCount! !== 0 && post.viewCount! % 100 === 0) {
+        const activityRef = doc(db, "activities", post!.uid);
+        const collectionRef = collection(activityRef, "activities");
+        const activityData: ActivityData = {
+          activityType: "alert",
+          postId: post.id,
+          isRead: false,
+          createdAt: new Date().toLocaleDateString("en", {
+            hour: "numeric",
+            minute: "numeric",
+            second: "numeric",
+          }),
+          message: `해당 게시물의 조회수가 ${post.viewCount}회가 넘었습니다!`,
+        };
+        await addDoc(collectionRef, activityData);
+      }
+
+      // 조회수를 업데이트 하는 로직
+      const postRef = doc(db, "posts", post.id);
+      await updateDoc(postRef, {
+        viewCount: post.viewCount! + 1,
+      });
+    }
+  }, [post]);
+
   useEffect(() => {
-    if (postId) getPost();
+    if (postId) {
+      getPost();
+    }
   }, [postId]);
 
   useEffect(() => {
     setCommentPosts([]);
     if (post) {
+      updateViewCount();
       if (post.comments && post.comments.length > 0) {
         const postsRef = collection(db, "posts");
         const postsQuery = query(
