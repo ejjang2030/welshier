@@ -29,8 +29,10 @@ import {db} from "firebaseApp";
 import PostList from "components/posts/PostList";
 import {Follower, Post, UserData} from "types";
 import {ActivityData} from "types/notifications";
+import {useTranslation} from "react-i18next";
 
 const ProfilePage = () => {
+  const {t} = useTranslation();
   const {user} = useContext(AuthContext);
   const location = useLocation();
   const [userData, setUserData] = useState<UserData | undefined>();
@@ -253,7 +255,7 @@ const ProfilePage = () => {
         <div className='profile__my-profile-buttons'>
           {isItMe ? (
             <button onClick={() => navigate("/profile/edit")}>
-              프로필 편집
+              {t("edit-profile")}
             </button>
           ) : (
             <>

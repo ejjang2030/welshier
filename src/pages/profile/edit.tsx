@@ -17,10 +17,12 @@ import {
   getTimeElapsed,
   isWithinTimePeriod,
 } from "utils/TimeUtils";
+import {useTranslation} from "react-i18next";
 
 const ProfileEditPage = () => {
   const {user} = useContext(AuthContext);
   const navigate = useNavigate();
+  const {t} = useTranslation();
 
   const profileImageRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState<string>("");
@@ -105,7 +107,6 @@ const ProfileEditPage = () => {
       setUserId(userData.userId);
       setIntro(userData.introduction);
       setIsPrivate(userData.isPrivate);
-      console.log(userData.imageUrl);
       setProfileImage(
         userData.imageUrl ||
           "https://firebasestorage.googleapis.com/v0/b/welshier.appspot.com/o/profiles%2Fdefault%2Fdefault-profile?alt=media&token=cc70557c-d6c7-4173-9e68-26f8b8fb2cc5"

@@ -14,10 +14,12 @@ import {
 import {db} from "firebaseApp";
 import SearchedUserItem from "components/users/SearchedUserItem";
 import PostBox from "components/posts/PostBox";
+import {useTranslation} from "react-i18next";
 
 type SearchTab = "users" | "hashtags";
 
 const SearchPage = () => {
+  const {t} = useTranslation();
   const [searchText, setSearchText] = useState<string>("");
   const [searchedUsers, setSearchedUsers] = useState<UserData[]>([]);
   const [searchedPosts, setSearchedPosts] = useState<Post[]>([]);
@@ -78,18 +80,22 @@ const SearchPage = () => {
     }
   }, [searchText]);
 
+  useEffect(() => {
+    console.log(t("search"));
+  }, [t]);
+
   return (
     <div className='search'>
       <div className='search__appbar'>
         <div className='search__appbar-text'>
-          <span>검색</span>
+          <span>{t("search")}</span>
         </div>
         <div className='search__appbar-input'>
           <SearchIcon className='icon' />
           <input
             type='text'
             value={searchText}
-            placeholder='검색'
+            placeholder={t("search")}
             onChange={handleOnChange}
           />
         </div>

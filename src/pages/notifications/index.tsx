@@ -12,9 +12,11 @@ import {
 } from "firebase/firestore";
 import {db} from "firebaseApp";
 import {useCallback, useContext, useEffect, useState} from "react";
+import {useTranslation} from "react-i18next";
 import {Activity} from "types/notifications";
 
 const NotificationPage = () => {
+  const {t} = useTranslation();
   const {user} = useContext(AuthContext);
   const [activities, setActivities] = useState<Activity[]>([]);
 
@@ -29,7 +31,6 @@ const NotificationPage = () => {
       onSnapshot(activitiesQuery, snapshot => {
         setActivities([]);
         snapshot.docs.forEach(doc => {
-          console.log(doc.data());
           setActivities(prev =>
             prev ? [...prev, {...doc.data(), id: doc.id} as Activity] : []
           );
@@ -55,7 +56,7 @@ const NotificationPage = () => {
     <div className='activities'>
       <div className='activities__appbar'>
         <div className='activities__appbar-text'>
-          <span>활동</span>
+          <span>{t("activities")}</span>
         </div>
       </div>
       {activities &&

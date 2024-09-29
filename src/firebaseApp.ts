@@ -1,6 +1,7 @@
 import {initializeApp, FirebaseApp, getApp} from "firebase/app";
-import {getFirestore} from "firebase/firestore";
+import {doc, getDoc, getFirestore} from "firebase/firestore";
 import {getStorage} from "firebase/storage";
+import {i18n} from "i18next";
 
 export let app: FirebaseApp;
 

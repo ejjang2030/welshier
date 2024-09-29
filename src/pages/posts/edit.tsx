@@ -28,10 +28,6 @@ const PostEditPage = () => {
     }
   }, [getPost, postId]);
 
-  useEffect(() => {
-    console.log(post);
-  }, [post]);
-
   return (
     <div>
       <div className='post-new__appbar'>

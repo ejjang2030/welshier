@@ -5,6 +5,10 @@ import "dayjs/locale/ko";
 dayjs.extend(relativeTime);
 dayjs.locale("ko");
 
+export const changeDayJsLang = (lang: string) => {
+  dayjs.locale(lang);
+};
+
 export const getTimeElapsed = (updatedTime: Date | string) => {
   return dayjs(updatedTime).fromNow();
 };

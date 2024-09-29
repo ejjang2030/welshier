@@ -1,11 +1,13 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, Suspense} from "react";
 import Router from "components/Router";
 import Layout from "components/Layout";
 import {getAuth, onAuthStateChanged} from "firebase/auth";
-import {app} from "firebaseApp";
+import {app, db} from "firebaseApp";
 import {ToastContainer, Bounce} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Loading from "components/loading/Loading";
+import {RecoilRoot} from "recoil";
+import i18n, {initializeI18n} from "./i18n.tsx";
 
 const App = () => {
   const auth = getAuth(app);
@@ -21,26 +23,34 @@ const App = () => {
       } else {
         setIsAuthenticated(false);
       }
-      setIsInit(true);
+      const initialize = async () => {
+        await initializeI18n();
+        setIsInit(true);
+      };
+      initialize();
     });
   }, [auth]);
 
   return (
-    <Layout isAuthenticated={isAuthenticated}>
-      <ToastContainer
-        position='bottom-center'
-        autoClose={1000}
-        hideProgressBar
-        newestOnTop
-        closeOnClick={false}
-        rtl={false}
-        pauseOnFocusLoss={false}
-        draggable={false}
-        pauseOnHover={false}
-        transition={Bounce}
-      />
-      {isInit ? <Router isAuthenticated={isAuthenticated} /> : <Loading />}
-    </Layout>
+    <Suspense fallback={<Loading />}>
+      <RecoilRoot>
+        <Layout isAuthenticated={isAuthenticated}>
+          <ToastContainer
+            position='bottom-center'
+            autoClose={1000}
+            hideProgressBar
+            newestOnTop
+            closeOnClick={false}
+            rtl={false}
+            pauseOnFocusLoss={false}
+            draggable={false}
+            pauseOnHover={false}
+            transition={Bounce}
+          />
+          {isInit ? <Router isAuthenticated={isAuthenticated} /> : <Loading />}
+        </Layout>
+      </RecoilRoot>
+    </Suspense>
   );
 };
 
