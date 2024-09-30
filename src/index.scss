@@ -36,6 +36,14 @@ body {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
+.logout-btn {
+  color: red;
+  font-weight: 600;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .appbar {
   padding: 16px;
   font-weight: 700;
@@ -1082,6 +1090,39 @@ body {
         border-radius: 8px;
         border: 1px solid #ddd;
       }
+    }
+  }
+}
+
+.settings__body {
+  display: flex;
+  flex-direction: column;
+  // gap: 16px;
+  height: calc(100vh - 58px);
+  &-item {
+    padding: 16px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    &:not(.logout):hover {
+      background-color: #ddd;
+    }
+    &.logout {
+      color: red;
+      font-weight: 600;
+    }
+    &.logout:hover {
+      background-color: none;
+      text-decoration: underline;
+    }
+  }
+  .icon {
+    width: 24px;
+    height: 24px;
+    color: black;
+    &:hover {
+      color: rgb(94, 94, 94);
     }
   }
 }
