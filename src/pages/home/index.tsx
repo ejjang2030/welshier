@@ -46,7 +46,7 @@ const HomePage = () => {
         <div className='home__title-right'>
           <HiMenuAlt4
             className='home__title-right-icon'
-            onClick={() => navigate("/posts")}
+            onClick={() => {}}
           />
         </div>
       </div>
