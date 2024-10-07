@@ -1,27 +1,52 @@
-import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
+import {v4 as uuidv4} from "uuid";
+import {
+  ref,
+  uploadString,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
 import {storage} from "firebaseApp";
-import {toast} from "react-toastify";
 
-const uploadImage = async (imageFile: Blob | undefined, url: string) => {
-  if (imageFile === null) return;
-  let imageUrl = "";
-  let imageByte = "";
-
+const uploadFile = async (file: Blob, folderName: string) => {
   const fileReader = new FileReader();
-  fileReader?.readAsDataURL(imageFile!);
-  fileReader.onloadend = (e: any) => {
-    const result = e?.currentTarget?.result;
-    imageByte = result;
-  };
-  //   const imageRef = ref(storage, url);
-  //   uploadBytes(imageRef, imageFile).then(snapshot => {
-  //     getDownloadURL(snapshot.ref)
-  //       .then(url => {
-  //         imageUrl = url;
-  //         toast.success("이미지 업로드에 성공하였습니다.");
-  //       })
-  //       .catch(error => toast.error(error));
-  //     //
-  //   });
-  return {imageUrl, imageByte};
+
+  const fileString: string = await new Promise((resolve, reject) => {
+    fileReader.readAsDataURL(file);
+    fileReader.onloadend = (e: any) => {
+      const result = e?.currentTarget?.result;
+      result ? resolve(result) : reject("File reading failed");
+    };
+  });
+
+  const fileName = uuidv4();
+  const storageRef = ref(storage, `${folderName}/${fileName}`);
+
+  const data = await uploadString(storageRef, fileString, "data_url");
+  const imageUrl = await getDownloadURL(data.ref);
+
+  return {imageUrl, fileString};
+};
+
+const downloadFile = async (filePath: string): Promise<void> => {
+  try {
+    const storageRef = ref(storage, filePath);
+    const downloadUrl = await getDownloadURL(storageRef);
+
+    const anchor = document.createElement("a");
+    anchor.href = downloadUrl;
+    anchor.download = filePath.split("/").pop() || "file";
+    anchor.click();
+  } catch (error) {
+    console.error("File download failed: ", error);
+  }
+};
+
+const deleteFile = async (filePath: string): Promise<void> => {
+  try {
+    const storageRef = ref(storage, filePath);
+    await deleteObject(storageRef);
+  } catch (error) {
+    console.error("File deletion failed: ", error);
+    throw error;
+  }
 };
